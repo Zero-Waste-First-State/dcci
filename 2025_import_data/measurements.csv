@@ -1,0 +1,76 @@
+measurement_id,submission_id,bin_type,temp_left,temp_middle,temp_right,left_squeeze,middle_squeeze,right_squeeze,left_corrective_actions,middle_corrective_actions,right_corrective_actions,mix
+1,4,bin_2,40,46,40,Good,Good,,Good,Good,,No
+2,5,bin_2,40,40,40,Frozen,None,,Frozen,None,,No
+3,6,bin_2,32,38,32,,Near frozen,,Near frozen added 5 gallons of water,Near frozen,,No
+4,8,bin_2,,,,Added water to bin 2,Good amount,,Added water to bin 2,Good amount,,Yes the material was mixed within Bin 2
+5,9,bin_2,,,,Added water,None,,Added water,None,,Yes the material was mixed while being added to Bin 2
+6,10,bin_2,37,37,37,0,0,,0,0,,No
+7,30,bin_2,40,60,40,frozen,good,,frozen,good,,No
+8,31,bin_2,65,86,65,Added 3 gallons of water,0,,Added 3 gallons of water,0,,Yes the material was mixed within Bin 2
+9,32,bin_2,110,120,110,0,0,,0,0,,No
+10,33,bin_2,120,135,120,good,good,,good,good,,No
+11,34,bin_2,110,125,110,a little dry0 added a few gallons of water,0,,a little dry0 added a few gallons of water,0,,Yes the material was mixed within Bin 2
+12,35,bin_2,110,120,110,0,0,,0,0,,No
+13,36,bin_2,100,125,110,Added 5 gallons of water,0,,Added 5 gallons of water,0,,Yes the material was mixed within Bin 2
+14,37,bin_2,110,115,110,0,0,,0,0,,No
+15,38,bin_2,115,120,110,None,Bone,,None,Bone,,No
+16,39,bin_2,110,118,115,Added several gallons of water,0,,Added several gallons of water,0,,Yes the material was mixed within Bin 2
+17,40,bin_2,80,89,80,Added 3 gallons of water0 but pretty moist,0,,Added 3 gallons of water0 but pretty moist,0,,Yes the material was mixed within Bin 2
+18,41,bin_2,75,80,70,added a few gallons of water,0,,added a few gallons of water,0,,Yes the material was mixed within Bin 2
+19,42,bin_2,80,80,80,good,good,,good,good,,Yes the material was mixed within Bin 2
+20,43,bin_2,60,60,58,Good,Good,,Good,Good,,Yes the material was mixed within Bin 2
+21,43,bin_3,,,0,,,,,,,0
+22,43,bin_4,0,,,Yes the material was mixed within Bin 4,,,Yes the material was mixed within Bin 4,,,
+23,44,bin_3,,,0,,,,,,,0
+24,44,bin_4,,,,,Yes the material was mixed within Bin 4,,,Yes the material was mixed within Bin 4,,
+25,45,bin_3,,,0,,,,,,,0
+26,45,bin_4,,,,,No,,,No,,
+27,48,bin_2,60,62,60,It's good,It's good,,It's good,It's good,,Yes the material was mixed within Bin 2
+28,50,bin_2,72,88,80,0,0,,0,0,,No
+29,51,bin_2,70,70,70,Good,Good,,Good,Good,,Yes the material was mixed within Bin 2
+30,52,bin_4,,,,,Yes the material was mixed within the Steel Bins,Good,,Yes the material was mixed within the Steel Bins,Good,Yes the material was mixed within the Steel Bins
+31,55,bin_2,72,88,78,0,C,,0,C,,No
+32,61,bin_2,100,101,90,Good amount,Good amount,,Good amount,Good amount,,No
+33,63,bin_2,100,138,115,0,0,,0,0,,No
+34,64,bin_2,132,135,132,Good amount,Good amount,,Good amount,Good amount,,Yes the material was mixed while being added to Bin 2
+35,65,bin_2,110,120,110,0,0,,0,0,,No
+36,67,bin_2,90,105,100,A little dry0 added abt 10 gallons of water,0,,A little dry0 added abt 10 gallons of water,0,,Yes the material was mixed within Bin 2
+37,68,bin_2,80,100,80,Good,Good but drier,,Good,Good but drier,,No
+38,69,bin_2,80,95,80,Added a few gallos of water,0,,Added a few gallos of water,0,,Yes the material was mixed while being added to Bin 2
+39,69,bin_3,,,,Good moisture level; ambient air,0,Yes  the material was mixed within Bin 3,Good moisture level; ambient air,0,Yes  the material was mixed within Bin 3,0
+40,69,bin_4,0,,,Yes the material was mixed within Bin 4,Yes the material was mixed within the Steel Bins,0,Yes the material was mixed within Bin 4,Yes the material was mixed within the Steel Bins,0,Yes the material was mixed within the Steel Bins
+41,71,bin_2,65,70,65,Added 507 gallons,0,,Added 507 gallons,0,,Yes the material was mixed while being added to Bin 2
+42,71,bin_3,,,,,0,0,Yes  the material was mixed within Bin 3,0,0,Yes  the material was mixed within Bin 3
+43,72,bin_2,80,80,75,Good,Good,,Good,Good,,Yes the material was mixed within Bin 2
+44,75,bin_2,75,75,75,0,0,,0,0,,Yes the material was mixed within Bin 2
+45,78,bin_2,84,88,86,1.3,0.7,,1.3,0.7,,Yes the material was mixed within Bin 2
+46,85,bin_2,75,80,75,A little dry added a few gallons,0,,A little dry added a few gallons,0,,Yes the material was mixed within Bin 2
+47,85,bin_3,70,,79,Added a gallon,0,Yes  the material was mixed within Bin 3,Added a gallon,0,Yes  the material was mixed within Bin 3,
+48,85,bin_4,,,,,Yes the material was mixed within Bin 4,Yes the material was mixed within the Steel Bins,0,Yes the material was mixed within Bin 4,Yes the material was mixed within the Steel Bins,0
+49,87,bin_2,79,79,79,Good,Good,,Good,Good,,No
+50,91,bin_2,80,80,80,Looks good,Ok,,Looks good,Ok,,No
+51,91,bin_3,82,,77,Little dry. Added 1.3 gal water,Same. Little dry. Added water.noticed little mushrooms growing on top. mixed them in,No,Little dry. Added 1.3 gal water,Same. Little dry. Added water.noticed little mushrooms growing on top. mixed them in,No,
+52,91,bin_4,,,,,No,,,No,,
+53,92,bin_2,97,97,97,Slightly dry added a0 1 gal,Slightly dey added a0 1 gal water,,Slightly dry added a0 1 gal,Slightly dey added a0 1 gal water,,No
+54,96,bin_2,82,82,82,Good amount,Good amount,,Good amount,Good amount,,No
+55,96,bin_3,81,,79,Good amount,Good amount,No,Good amount,Good amount,No,
+56,96,bin_4,,,,,No,,,No,,
+57,99,bin_2,98,100,98,Added 2 gallons of water,0,,Added 2 gallons of water,0,,Yes the material was mixed within Bin 2
+58,99,bin_3,,,80,0,0,Yes  the material was mixed within Bin 3,0,0,Yes  the material was mixed within Bin 3,
+59,99,bin_4,,,,,Yes the material was mixed within Bin 4,Yes the material was mixed within the Steel Bins,0,Yes the material was mixed within Bin 4,Yes the material was mixed within the Steel Bins,0
+60,101,bin_2,82,88,82,Good,Good,,Good,Good,,Yes the material was mixed within Bin 2
+61,101,bin_3,80,,75,Good,Good,No,Good,Good,No,
+62,101,bin_4,,,,,No,,,No,,
+63,103,bin_2,115,121,115,0,0,,0,0,,No
+64,104,bin_2,95,94,93,Good amount,Good amount,,Good amount,Good amount,,Yes the material was mixed within Bin 2
+65,105,bin_3,79,,,Little dry,Little Dry,No,Little dry,Little Dry,No,
+66,107,bin_2,90,90,90,0,0,,0,0,,Yes the material was mixed within Bin 2
+67,112,bin_2,81,84,82,Good amount,Good amount,,Good amount,Good amount,,No
+68,112,bin_3,81,,78,Drier than bin 2 still good,Drier than bin 2 still good,No,Drier than bin 2 still good,Drier than bin 2 still good,No,
+69,112,bin_4,,,,,No,,,No,,
+70,114,bin_4,,,,,No,0,,No,0,No
+71,143,bin_2,0,0,0,0,Yes,,0,Yes,,Yes the material was mixed within Bin 2
+72,144,bin_3,100,,,Too dry added water,Too dry added water,Yes the material was mixed while being added to Bin 3,Too dry added water,Too dry added water,Yes the material was mixed while being added to Bin 3,
+73,147,bin_2,80,82,81,Good amount,Good amount,,Good amount,Good amount,,No
+74,151,bin_2,0,0,0,Added water to bin 2,Added water to bin 2,,Added water to bin 2,Added water to bin 2,,Yes the material was mixed within Bin 2
+75,156,bin_3,70,,,A good amount. I turned and added water as instructed,A good amount. I turned and added water as instructed,Yes  the material was mixed within Bin 3,A good amount. I turned and added water as instructed,A good amount. I turned and added water as instructed,Yes  the material was mixed within Bin 3,
