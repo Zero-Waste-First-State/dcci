@@ -38,7 +38,7 @@
 You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
 
 ## Deploy to Vercel
-
+//comment to force vercel deployment, since devops external accounts cant trigger deployments in vercel
 Vercel deployment will guide you through creating a Supabase account and project.
 
 After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
