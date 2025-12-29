@@ -38,7 +38,7 @@
 You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
 
 ## Deploy to Vercel
-
+//comment to force vercel deployment, since devops external accounts cant trigger deployments in vercel
 Vercel deployment will guide you through creating a Supabase account and project.
 
 After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
@@ -103,3 +103,4 @@ Please file feedback and issues over on the [Supabase GitHub org](https://github
 - [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
 - [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
 - [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+- [ignore this]
