@@ -52,6 +52,7 @@ export function ImpactStatistics() {
       // Get current year start date
       const currentYear = new Date().getFullYear();
       const yearStart = new Date(currentYear, 0, 1).toISOString();
+      const baselineEnd = new Date("2024-12-31T23:59:59Z");
       const launchDate = new Date('2024-01-01').toISOString();
 
       // Fetch total sites
@@ -98,11 +99,11 @@ export function ImpactStatistics() {
         yearToDateSubmissions.map(s => `${s.first_name}_${s.last_name}`)
       ).size;
 
-      // Total greens processed (in pounds) - use 2024 final results for total
-      const totalGreensProcessed = DNREC_2024_FINAL_RESULTS.greens.pounds;
-
-      // Estimated food scraps diverted (conservative calculation)
-      const totalFoodScrapsDiverted = totalGreensProcessed * FOOD_SCRAPS_PERCENTAGE * LANDFILL_DIVERSION_PERCENTAGE;
+      const postBaselineSubmissions =
+        submissionsData?.filter(s => new Date(s.timestamp) > baselineEnd) || [];
+      const postBaselineSubmissionIds = postBaselineSubmissions.map(
+        s => s.submission_id
+      );
 
       // Year-to-date greens processed using DCCI bucket adjustment
       const yearToDateSubmissionIds = yearToDateSubmissions.map(s => s.submission_id);
@@ -116,20 +117,41 @@ export function ImpactStatistics() {
         return sum;
       }, 0) || 0;
 
+      const postBaselineGreens = addingData?.filter(
+        record => postBaselineSubmissionIds.includes(record.submission_id)
+      ).reduce((sum, record) => {
+        if (record.greens_pounds && record.greens_pounds > 0) {
+          return sum + Math.max(0, record.greens_pounds - BUCKET_WEIGHT);
+        }
+        return sum;
+      }, 0) || 0;
+
       // Year-to-date estimated food scraps diverted
       const yearToDateFoodScraps = yearToDateGreensProcessed * FOOD_SCRAPS_PERCENTAGE * LANDFILL_DIVERSION_PERCENTAGE;
 
-      // Total compost created (in gallons) - use 2024 final results for total
-      const totalCompostCreated = DNREC_2024_FINAL_RESULTS.finished_compost.gallons;
+      const postBaselineFoodScraps = postBaselineGreens * FOOD_SCRAPS_PERCENTAGE * LANDFILL_DIVERSION_PERCENTAGE;
 
       // Year-to-date compost
       const yearToDateCompost = compostData?.filter(
         record => yearToDateSubmissionIds.includes(record.submission_id)
       ).reduce((sum, record) => sum + (record.gallons_compost_taken || 0), 0) || 0;
 
-      // Calculate environmental impact
+      const postBaselineCompost = compostData?.filter(
+        record => postBaselineSubmissionIds.includes(record.submission_id)
+      ).reduce((sum, record) => sum + (record.gallons_compost_taken || 0), 0) || 0;
+
+      const baselineGreens = DNREC_2024_FINAL_RESULTS.greens.pounds;
+      const baselineFoodScraps = baselineGreens * FOOD_SCRAPS_PERCENTAGE * LANDFILL_DIVERSION_PERCENTAGE;
+      const baselineCompost = DNREC_2024_FINAL_RESULTS.finished_compost.gallons;
+
+      const totalGreensProcessed = baselineGreens + postBaselineGreens;
+      const totalFoodScrapsDiverted = baselineFoodScraps + postBaselineFoodScraps;
+      const totalCompostCreated = baselineCompost + postBaselineCompost;
+
       const totalCo2Saved = totalFoodScrapsDiverted * CO2_PER_POUND_FOOD_SCRAPS;
       const totalGasConserved = totalFoodScrapsDiverted * GAS_PER_POUND_FOOD_SCRAPS;
+
+      // Calculate environmental impact
       const yearToDateCo2 = yearToDateFoodScraps * CO2_PER_POUND_FOOD_SCRAPS;
       const yearToDateGas = yearToDateFoodScraps * GAS_PER_POUND_FOOD_SCRAPS;
 
