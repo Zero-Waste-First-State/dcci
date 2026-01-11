@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 import { renderToBuffer } from '@react-pdf/renderer';
 import DnrecPdf from './DnrecPdf';
 import { DNREC_2024_FINAL_RESULTS } from '@/lib/constants';
+import { calculateQuarterlyReport } from '@/lib/dnrec-calculations';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,14 +17,6 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const yearParam = searchParams.get('year');
   const siteParam = searchParams.get('site');
-  
-  // Build arguments for RPC function - always pass both parameters explicitly
-  const args: any = {};
-  if (yearParam) {
-    args.year_input = parseInt(yearParam, 10);
-  }
-  // Always pass site_id_input, use null for "total" to avoid function ambiguity
-  args.site_id_input = (siteParam && siteParam !== 'total') ? parseInt(siteParam, 10) : null;
 
   let data;
   let error;
@@ -43,10 +36,22 @@ export async function GET(req: Request) {
     }];
     error = null;
   } else {
-    // Use normal database query for other years
-    const result = await supabase.rpc('dnrec_report', args);
-    data = result.data;
-    error = result.error;
+    // Calculate quarterly data using TypeScript instead of SQL function
+    try {
+      const year = parseInt(yearParam || '0', 10);
+      const siteId = (siteParam && siteParam !== 'total') ? parseInt(siteParam, 10) : null;
+      
+      if (isNaN(year) || year < 2000 || year > 3000) {
+        throw new Error('Invalid year parameter');
+      }
+
+      data = await calculateQuarterlyReport(supabase, year, siteId);
+      error = null;
+    } catch (err) {
+      error = err as Error;
+      data = null;
+      console.error('Error calculating quarterly report:', err);
+    }
   }
 
   if (error) {
