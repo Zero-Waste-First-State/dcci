@@ -86,20 +86,19 @@ export async function calculateQuarterlyReport(
   const submissionIds = submissions.map(s => s.submission_id);
 
   // Fetch all related data in parallel for better performance
+  // NOTE: "Browns Bin" table (bins A & B) is for STORAGE ONLY and NOT included in DNREC reports
+  // DNREC reports only use browns from "Adding Material" table (bins 1-3)
   const [
     { data: addingMaterialData, error: addingError },
-    { data: brownsBinData, error: brownsError },
     { data: finishedCompostData, error: compostError },
     { data: litterData, error: litterError }
   ] = await Promise.all([
     supabase.from('Adding Material').select('*').in('submission_id', submissionIds),
-    supabase.from('Browns Bin').select('*').in('submission_id', submissionIds),
     supabase.from('Finished Compost').select('*').in('submission_id', submissionIds),
     supabase.from('Litter').select('*').in('submission_id', submissionIds)
   ]);
 
   if (addingError) throw new Error(`Error fetching adding material: ${addingError.message}`);
-  if (brownsError) throw new Error(`Error fetching browns bin: ${brownsError.message}`);
   if (compostError) throw new Error(`Error fetching finished compost: ${compostError.message}`);
   if (litterError) throw new Error(`Error fetching litter: ${litterError.message}`);
 
@@ -137,50 +136,20 @@ export async function calculateQuarterlyReport(
       return sum + (am.greens_gallons || 0);
     }, 0);
 
-    // Calculate browns from "Browns Bin" table (THE BUG FIX!)
-    const quarterBrownsBin = (brownsBinData || []).filter(
-      bb => quarterSubmissionIds.has(bb.submission_id)
-    );
-
-    // ✅ FIXED: Sum both bin_a and bin_b (this was the bug!)
-    const brownsBinGallons = quarterBrownsBin.reduce((sum, bb) => {
-      const binA = bb.bin_a_browns_gallons || 0;
-      const binB = bb.bin_b_browns_gallons || 0;
-      const total = binA + binB;
-      return sum + total;
-    }, 0);
-
-    // Browns pounds from "Browns Bin" table (with conversion and bucket adjustment)
-    const brownsBinLbs = quarterBrownsBin.reduce((sum, bb) => {
-      const binA = bb.bin_a_browns_gallons || 0;
-      const binB = bb.bin_b_browns_gallons || 0;
-      const gallons = binA + binB;
-      if (gallons > 0) {
-        // DCCI method: (gallons × 1.2) - bucket weight
-        const weight = Math.max(0, (gallons * BROWNS_GALLONS_TO_POUNDS) - BUCKET_WEIGHT);
-        return sum + weight;
-      }
-      return sum;
-    }, 0);
-
-    // Calculate browns from "Adding Material" table (regular bins)
-    const addingMaterialBrownsGallons = quarterGreens.reduce((sum, am) => {
+    // Calculate browns from "Adding Material" table ONLY (bins 1-3)
+    // NOTE: "Browns Bin" table (bins A & B) is for STORAGE ONLY and NOT included in DNREC reports
+    // Browns are recorded when members add material to bins 1-3 during greens drop-off
+    const quarterBrownsRecords = quarterGreens.filter(am => (am.browns_gallons || 0) > 0);
+    
+    // Total browns gallons (simple sum)
+    const totalBrownsGallons = quarterBrownsRecords.reduce((sum, am) => {
       return sum + (am.browns_gallons || 0);
     }, 0);
 
-    const addingMaterialBrownsLbs = quarterGreens.reduce((sum, am) => {
-      const gallons = am.browns_gallons || 0;
-      if (gallons > 0) {
-        // DCCI method: (gallons × 1.2) - bucket weight
-        const weight = Math.max(0, (gallons * BROWNS_GALLONS_TO_POUNDS) - BUCKET_WEIGHT);
-        return sum + weight;
-      }
-      return sum;
-    }, 0);
-
-    // Combine browns from both tables
-    const totalBrownsGallons = brownsBinGallons + addingMaterialBrownsGallons;
-    const totalBrownsLbs = brownsBinLbs + addingMaterialBrownsLbs;
+    // Total browns pounds: (total gallons × 1.2) - (number of instances × 1.8)
+    // This is the DNREC method: convert gallons to pounds, then subtract bucket weight per instance
+    const numberOfInstances = quarterBrownsRecords.length;
+    const totalBrownsLbs = Math.max(0, (totalBrownsGallons * BROWNS_GALLONS_TO_POUNDS) - (numberOfInstances * BUCKET_WEIGHT));
 
     // Calculate finished compost
     const quarterCompost = (finishedCompostData || []).filter(
