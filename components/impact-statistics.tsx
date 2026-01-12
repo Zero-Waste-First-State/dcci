@@ -69,10 +69,10 @@ export function ImpactStatistics() {
 
       if (submissionsError) throw submissionsError;
 
-      // Fetch adding material data (food scraps) - include both pounds and gallons
+      // Fetch adding material data (food scraps) - only need pounds for greens calculation
       const { data: addingData, error: addingError } = await supabase
         .from('Adding Material')
-        .select('submission_id, greens_pounds, greens_gallons');
+        .select('submission_id, greens_pounds');
 
       if (addingError) throw addingError;
 
@@ -106,38 +106,30 @@ export function ImpactStatistics() {
       );
 
       // Year-to-date greens processed using DCCI bucket adjustment
+      // Only sum greens_pounds (gallons are a different measurement and should not be converted/added)
       const yearToDateSubmissionIds = yearToDateSubmissions.map(s => s.submission_id);
       const yearToDateGreensProcessed = addingData?.filter(
         record => yearToDateSubmissionIds.includes(record.submission_id)
       ).reduce((sum, record) => {
-        let totalPounds = 0;
-        // Include greens_pounds (with bucket adjustment)
+        // Only include greens_pounds (with bucket adjustment)
         if (record.greens_pounds && record.greens_pounds > 0) {
           // DCCI method: Subtract bucket weight (1.8 lbs per drop-off)
-          totalPounds += Math.max(0, record.greens_pounds - BUCKET_WEIGHT);
+          return sum + Math.max(0, record.greens_pounds - BUCKET_WEIGHT);
         }
-        // Include greens_gallons (convert to pounds: 1 gallon = 8.34 lbs for water-based materials)
-        if (record.greens_gallons && record.greens_gallons > 0) {
-          // Convert gallons to pounds (greens are water-based, so 8.34 lbs/gallon)
-          totalPounds += record.greens_gallons * 8.34;
-        }
-        return sum + totalPounds;
+        return sum;
       }, 0) || 0;
 
+      // Post-baseline greens processed using DCCI bucket adjustment
+      // Only sum greens_pounds (gallons are a different measurement and should not be converted/added)
       const postBaselineGreens = addingData?.filter(
         record => postBaselineSubmissionIds.includes(record.submission_id)
       ).reduce((sum, record) => {
-        let totalPounds = 0;
-        // Include greens_pounds (with bucket adjustment)
+        // Only include greens_pounds (with bucket adjustment)
         if (record.greens_pounds && record.greens_pounds > 0) {
-          totalPounds += Math.max(0, record.greens_pounds - BUCKET_WEIGHT);
+          // DCCI method: Subtract bucket weight (1.8 lbs per drop-off)
+          return sum + Math.max(0, record.greens_pounds - BUCKET_WEIGHT);
         }
-        // Include greens_gallons (convert to pounds: 1 gallon = 8.34 lbs for water-based materials)
-        if (record.greens_gallons && record.greens_gallons > 0) {
-          // Convert gallons to pounds (greens are water-based, so 8.34 lbs/gallon)
-          totalPounds += record.greens_gallons * 8.34;
-        }
-        return sum + totalPounds;
+        return sum;
       }, 0) || 0;
 
       // Year-to-date estimated food scraps diverted
@@ -154,9 +146,8 @@ export function ImpactStatistics() {
         record => postBaselineSubmissionIds.includes(record.submission_id)
       ).reduce((sum, record) => sum + (record.gallons_compost_taken || 0), 0) || 0;
 
-      // Use helper function to include both pounds and gallons from 2024 baseline
-      // This converts gallons to pounds (8.34 lbs/gallon for water-based materials like greens)
-      const baselineGreens = DNREC_CALCULATIONS.getTotalGreensWeight();
+      // Baseline greens from 2024 - only use pounds (gallons are a different measurement)
+      const baselineGreens = DNREC_2024_FINAL_RESULTS.greens.pounds;
       const baselineFoodScraps = baselineGreens * FOOD_SCRAPS_PERCENTAGE * LANDFILL_DIVERSION_PERCENTAGE;
       const baselineCompost = DNREC_2024_FINAL_RESULTS.finished_compost.gallons;
 
