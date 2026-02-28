@@ -1,3 +1,8 @@
+/**
+ * DCCI public home page: hero (logos + title), impact statistics, CTA to compost form, footer.
+ * Logos: PFD left, ZWFS right (add public/zwfs-logo.png with transparent background).
+ * @see docs/BRANDING.md for favicon and logo setup
+ */
 import { EnvVarWarning } from "@/components/env-var-warning";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { ImpactStatistics } from "@/components/impact-statistics";
@@ -28,26 +33,34 @@ export default function Home() {
       
       <div className="flex-1 w-full flex flex-col gap-12 md:gap-20 items-center">
          <div className="flex-1 flex flex-col gap-12 md:gap-20 max-w-5xl p-4 md:p-5">
-           {/* Hero Section with PFD Logo */}
+           {/* Hero: PFD logo left, title center, ZWFS logo right (use transparent PNGs in public/) */}
            <div className="flex flex-col items-center gap-8">
-             {/* DCCI Header Box */}
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6 md:p-8 shadow-lg w-full max-w-4xl">
-              <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 justify-center">
+              <div className="flex flex-row items-center justify-between gap-4 md:gap-6">
                 <Image
                   src="/pfd-logo.jpg"
-                  alt="DCCI Logo"
+                  alt="Plastic Free Delaware"
                   width={80}
                   height={80}
-                  className="rounded-lg shadow-md"
+                  className="rounded-lg shadow-md object-contain flex-shrink-0"
                 />
-                <div className="text-center">
+                <div className="text-center flex-1 min-w-0">
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-700 mb-2 leading-tight">
-                    Delaware Community Composting Initiative
+                    Delaware Community
+                    <br />
+                    Composting Initiative
                   </h1>
                   <p className="text-base md:text-lg text-green-600 font-medium">
                     Data Collection Home Page
                   </p>
                 </div>
+                <Image
+                  src="/zwfs-logo.png"
+                  alt="Zero Waste First State"
+                  width={80}
+                  height={80}
+                  className="rounded-lg shadow-md object-contain flex-shrink-0"
+                />
               </div>
             </div>
           </div>
@@ -123,7 +136,7 @@ export default function Home() {
                       height={32}
                       className="rounded-full sm:w-10 sm:h-10"
                     />
-                    <span className="text-base md:text-lg font-bold text-green-700">DCCI X Hack4Impact</span>
+                    <span className="text-base md:text-lg font-bold text-green-700">DCCI</span>
                   </Link>
                 </div>
                 <div className="flex gap-3 md:gap-4 items-center">

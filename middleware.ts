@@ -1,3 +1,7 @@
+/**
+ * Next.js middleware: refreshes Supabase session and protects /dashboard (redirect to login if unauthenticated).
+ * Public routes (e.g. /, /compost-form) are not protected.
+ */
 import { updateSession } from "@/lib/supabase/middleware";
 import { type NextRequest } from "next/server";
 
