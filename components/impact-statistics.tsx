@@ -1,38 +1,44 @@
 "use client";
 
+/**
+ * Impact Statistics – public impact stats for the DCCI home page.
+ * Fetches submission data from Supabase and computes totals, YTD, and EPA-aligned estimates.
+ * @see DCCI_CALCULATIONS_README.md for methodology
+ */
+
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import Image from "next/image";
-import { DNREC_2024_FINAL_RESULTS, DNREC_CALCULATIONS } from "@/lib/constants";
+import { DNREC_2024_FINAL_RESULTS } from "@/lib/constants";
 
 interface ImpactStats {
   totalSites: number;
   totalParticipants: number;
-  totalGreensProcessed: number; // in pounds
-  totalFoodScrapsDiverted: number; // in pounds (estimated)
-  totalCompostCreated: number; // in gallons
-  co2Saved: number; // in pounds (estimated)
-  gasConserved: number; // in gallons (estimated)
+  totalGreensProcessed: number; // pounds (used internally; not shown in "Since the Start" block)
+  totalFoodScrapsDiverted: number; // pounds (estimated)
+  totalMethaneReduced: number; // tons CH4 (EPA methodology)
+  totalCompostCreated: number; // gallons
+  co2Saved: number; // pounds (EPA estimate)
+  gasConserved: number; // gallons (transportation savings)
   yearToDateParticipants: number;
-  yearToDateGreensProcessed: number; // in pounds
-  yearToDateFoodScraps: number; // in pounds (estimated)
-  yearToDateCompost: number; // in gallons
-  yearToDateCo2: number; // in pounds (estimated)
-  yearToDateGas: number; // in gallons (estimated)
+  yearToDateGreensProcessed: number; // pounds
+  yearToDateFoodScraps: number; // pounds (estimated)
+  yearToDateCompost: number; // gallons
+  yearToDateCo2: number; // pounds
+  yearToDateGas: number; // gallons
 }
 
-// Conversion factors
-// DCCI Weight Estimation Constants
-// Note: Finished compost is only reported in gallons, not converted to weight
-const BUCKET_WEIGHT = 1.8; // Bucket weight in pounds (from DCCI instructions)
-const BROWNS_GALLONS_TO_POUNDS = 1.2; // 1 gallon browns = 1.2 pounds (from DCCI instructions)
+// --- Conversion & weight constants (DCCI) ---
+const BUCKET_WEIGHT = 1.8; // lbs per bucket (DCCI instructions)
 const POUNDS_TO_TONS = 2000;
 
-// EPA-aligned estimates for environmental impact calculations
-const FOOD_SCRAPS_PERCENTAGE = 0.98; // DCCI requirement: 98% of greens are food scraps
-const LANDFILL_DIVERSION_PERCENTAGE = 1.0; // 100% of food scraps diverted from landfill (same as food scraps percentage)
-const CO2_PER_POUND_FOOD_SCRAPS = 0.5; // EPA estimate: 0.5 lbs CO2 per lb of food waste diverted
-const GAS_PER_POUND_FOOD_SCRAPS = 0.1; // Rough estimate: 0.1 gallons gas saved per lb diverted
+// --- EPA-aligned environmental impact constants ---
+const FOOD_SCRAPS_PERCENTAGE = 0.98; // DCCI: 98% of greens are food scraps
+const LANDFILL_DIVERSION_PERCENTAGE = 1.0; // 100% diverted from landfill
+const CO2_PER_POUND_FOOD_SCRAPS = 0.5; // EPA: lbs CO2 saved per lb food waste diverted
+const GAS_PER_POUND_FOOD_SCRAPS = 0.1; // Transportation savings (gallons per lb)
+// EPA: avoided methane per ton of food waste diverted from landfill (tons CH4 per ton food waste)
+// Source: https://www.epa.gov/land-research/quantifying-methane-emissions-landfilled-food-waste
+const TONS_METHANE_PER_TON_FOOD_SCRAPS = 0.042;
 
 export function ImpactStatistics() {
   const [stats, setStats] = useState<ImpactStats | null>(null);
@@ -157,8 +163,10 @@ export function ImpactStatistics() {
 
       const totalCo2Saved = totalFoodScrapsDiverted * CO2_PER_POUND_FOOD_SCRAPS;
       const totalGasConserved = totalFoodScrapsDiverted * GAS_PER_POUND_FOOD_SCRAPS;
+      // Methane reduced (tons CH4) per EPA methodology: tons food scraps × factor
+      const totalFoodScrapsTons = totalFoodScrapsDiverted / POUNDS_TO_TONS;
+      const totalMethaneReduced = totalFoodScrapsTons * TONS_METHANE_PER_TON_FOOD_SCRAPS;
 
-      // Calculate environmental impact
       const yearToDateCo2 = yearToDateFoodScraps * CO2_PER_POUND_FOOD_SCRAPS;
       const yearToDateGas = yearToDateFoodScraps * GAS_PER_POUND_FOOD_SCRAPS;
 
@@ -167,6 +175,7 @@ export function ImpactStatistics() {
         totalParticipants: uniqueParticipants,
         totalGreensProcessed,
         totalFoodScrapsDiverted,
+        totalMethaneReduced,
         totalCompostCreated,
         co2Saved: totalCo2Saved,
         gasConserved: totalGasConserved,
@@ -219,181 +228,138 @@ export function ImpactStatistics() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-8 shadow-lg w-full max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="mb-4">
-          <h2 className="text-2xl font-bold text-green-700 mb-1">
-            DELAWARE COMMUNITY COMPOSTING INITIATIVE
-          </h2>
-          <p className="text-lg font-semibold text-green-600">
-            You're having an impact!
-          </p>
-        </div>
-      </div>
-
-      {/* Total Since Launch Section */}
-      <div className="mb-8">
-        <h3 className="text-xl font-bold text-green-700 mb-4 text-center">
-          Total since the launch of DCCI in January 1, 2024:
+    <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6 md:p-8 shadow-lg w-full max-w-4xl mx-auto">
+      {/* Section: Total since launch (Jan 1, 2024) – no redundant title block */}
+      <div className="mb-6 md:mb-8">
+        <h3 className="text-lg md:text-xl font-bold text-green-700 mb-3 md:mb-4 text-center">
+          Since the launch of DCCI (January 1, 2024)
         </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border border-green-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+          <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {stats.totalSites}
               </div>
-              <div className="text-sm md:text-base font-medium text-gray-700">DCCI Sites Launched</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">DCCI Sites Launched</div>
             </div>
           </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border border-green-100">
+          <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {formatNumber(stats.totalParticipants)}
               </div>
-              <div className="text-sm md:text-base font-medium text-gray-700">DCCI Participants</div>
-              <div className="text-xs md:text-sm text-gray-500 mt-1">Unique form submitters</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">DCCI Participants</div>
             </div>
           </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border border-green-100">
+          <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
-                {formatTons(stats.totalGreensProcessed)}
-              </div>
-              <div className="text-sm md:text-base font-medium text-gray-700">Tons of Greens Processed</div>
-              <div className="text-xs md:text-sm text-gray-500 mt-1">Food scraps + grass clippings + plant trimmings</div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border border-green-100">
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {formatTons(stats.totalFoodScrapsDiverted)}
               </div>
-              <div className="text-sm md:text-base font-medium text-gray-700">Est. Food Scraps Diverted</div>
-              <div className="text-xs md:text-sm text-gray-500 mt-1">Tons (50% of greens processed)</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Tons of Food Scraps Diverted</div>
             </div>
           </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border border-green-100">
+          <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
+                {formatNumber(stats.totalMethaneReduced, 2)}
+              </div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Tons of Methane Production Reduced</div>
+              <div className="text-xs md:text-sm text-gray-500 mt-0.5">EPA methodology (avoided landfilled food waste)</div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
+            <div className="text-center">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {formatNumber(stats.co2Saved, 0)}
               </div>
-              <div className="text-sm md:text-base font-medium text-gray-700">Est. CO₂ Saved</div>
-              <div className="text-xs md:text-sm text-gray-500 mt-1">Pounds (EPA estimate)</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Lbs. CO₂ Saved (EPA Estimate)</div>
             </div>
           </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border border-green-100">
+          <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {formatNumber(stats.gasConserved, 1)}
               </div>
-              <div className="text-sm md:text-base font-medium text-gray-700">Est. Gas Conserved</div>
-              <div className="text-xs md:text-sm text-gray-500 mt-1">Gallons (transportation savings)</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Gallons Gas Conserved (transportation savings)</div>
             </div>
           </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border border-green-100">
+          <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {formatNumber(stats.totalCompostCreated, 0)}
               </div>
-              <div className="text-sm md:text-base font-medium text-gray-700">Gallons Compost Created</div>
-              <div className="text-xs md:text-sm text-gray-500 mt-1">Finished compost collected</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Gallons Compost Created</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Year-to-Date Section */}
+      {/* Section: So far this year */}
       <div>
-        <h3 className="text-xl font-bold text-green-700 mb-4 text-center">
-          And, so far this year as of today:
+        <h3 className="text-lg md:text-xl font-bold text-green-700 mb-3 md:mb-4 text-center">
+          So far this year (as of today)
         </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border border-green-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+          <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {formatNumber(stats.yearToDateParticipants)}
               </div>
-              <div className="text-sm md:text-base font-medium text-gray-700">DCCI Participants</div>
-              <div className="text-xs md:text-sm text-gray-500 mt-1">Unique form submitters</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">DCCI Participants</div>
             </div>
           </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border border-green-100">
+          <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
-                {formatNumber(stats.yearToDateGreensProcessed, 0)}
-              </div>
-              <div className="text-sm md:text-base font-medium text-gray-700">Lbs Greens Processed</div>
-              <div className="text-xs md:text-sm text-gray-500 mt-1">Food scraps + grass clippings + plant trimmings</div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border border-green-100">
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {formatNumber(stats.yearToDateFoodScraps, 0)}
               </div>
-              <div className="text-sm md:text-base font-medium text-gray-700">Est. Food Scraps Diverted</div>
-              <div className="text-xs md:text-sm text-gray-500 mt-1">Pounds (50% of greens processed)</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Est. Food Scraps Diverted (lbs)</div>
             </div>
           </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border border-green-100">
+          <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {formatNumber(stats.yearToDateCo2, 0)}
               </div>
-              <div className="text-sm md:text-base font-medium text-gray-700">Est. CO₂ Saved</div>
-              <div className="text-xs md:text-sm text-gray-500 mt-1">Pounds (EPA estimate)</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Lbs. CO₂ Saved (EPA Estimate)</div>
             </div>
           </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border border-green-100">
+          <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {formatNumber(stats.yearToDateGas, 1)}
               </div>
-              <div className="text-sm md:text-base font-medium text-gray-700">Est. Gas Conserved</div>
-              <div className="text-xs md:text-sm text-gray-500 mt-1">Gallons (transportation savings)</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Gallons Gas Conserved (transportation savings)</div>
             </div>
           </div>
-
-          <div className="bg-white rounded-xl p-4 md:p-6 shadow-md border border-green-100">
+          <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
+              <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {formatNumber(stats.yearToDateCompost, 0)}
               </div>
-              <div className="text-sm md:text-base font-medium text-gray-700">Gallons Compost Created</div>
-              <div className="text-xs md:text-sm text-gray-500 mt-1">Finished compost collected</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Gallons Compost Created</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Methodology Disclaimer */}
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-4 md:p-6">
-        <h4 className="text-base md:text-lg font-semibold text-blue-800 mb-3">Methodology & Estimates</h4>
-        <div className="text-xs md:text-sm text-blue-700 space-y-2">
+      {/* Methodology disclaimer – slightly larger font for readability */}
+      <div className="mt-6 md:mt-8 bg-blue-50 border border-blue-200 rounded-xl p-4 md:p-6">
+        <h4 className="text-sm md:text-base font-semibold text-blue-800 mb-2">Methodology & Estimates</h4>
+        <div className="text-sm md:text-base text-blue-700 space-y-2">
           <p>
-            <strong>Greens Processed:</strong> Total weight of nitrogen-rich materials (food scraps, grass clippings, plant trimmings) added to composting bins.
+            <strong>Food Scraps Diverted:</strong> EPA-aligned estimate (98% of greens as food scraps, 100% diverted from landfill).
           </p>
           <p>
-            <strong>Food Scraps Diverted:</strong> EPA-aligned estimate assuming 50% of greens are food scraps and 75% would have gone to landfills.
+            <strong>Methane Reduced:</strong> Based on EPA methodology for avoided landfilled food waste. See{" "}
+            <a href="https://www.epa.gov/land-research/quantifying-methane-emissions-landfilled-food-waste" target="_blank" rel="noreferrer noopener" className="underline">EPA Quantifying Methane Emissions from Landfilled Food Waste</a>.
           </p>
           <p>
-            <strong>Environmental Impact:</strong> Based on EPA estimates for methane reduction and transportation savings. These are approximations for educational purposes.
+            <strong>CO₂ & Gas:</strong> EPA estimate for CO₂; transportation savings for gas conserved. Approximations for educational purposes.
           </p>
           <p>
-            <strong>Data Sources:</strong> All statistics calculated from actual form submissions in the DCCI database.
+            <strong>Data:</strong> All statistics from actual form submissions in the DCCI database.
           </p>
         </div>
       </div>

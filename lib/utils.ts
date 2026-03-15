@@ -1,3 +1,6 @@
+/**
+ * Shared utilities: className merge (cn), form data URL parsing for compost-form flow, env checks.
+ */
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 

@@ -11,7 +11,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: 'DCCI x Hack4Impact',
+  title: 'DCCI',
   description: 'Delaware Community Composting Initiative - Data Collection Platform',
   viewport: {
     width: 'device-width',
