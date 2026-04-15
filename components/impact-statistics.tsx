@@ -240,7 +240,7 @@ export function ImpactStatistics() {
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {stats.totalSites}
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">DCCI Sites Launched</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">DCCI {stats.totalSites > 1 ? 'Sites' : 'Site'} Launched</div>
             </div>
           </div>
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
