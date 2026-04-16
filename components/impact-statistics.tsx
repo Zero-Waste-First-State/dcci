@@ -232,64 +232,66 @@ export function ImpactStatistics() {
       {/* Section: Total since launch (Jan 1, 2024) – no redundant title block */}
       <div className="mb-6 md:mb-8">
         <h3 className="text-lg md:text-xl font-bold text-green-700 mb-3 md:mb-4 text-center">
-          Since the launch of DCCI (January 1, 2024)
+          Since Launch (January 1, 2024)
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
-                {stats.totalSites}
+                {stats.totalSites} {stats.totalSites > 1 ? 'Sites' : 'Site'}
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">DCCI {stats.totalSites > 1 ? 'Sites' : 'Site'} Launched</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Launch</div>
             </div>
           </div>
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
-                {formatNumber(stats.totalParticipants)}
+                {formatNumber(stats.totalParticipants)} Members
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">DCCI Participants</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Participating</div>
             </div>
           </div>
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
-                {formatTons(stats.totalFoodScrapsDiverted)}
+                {formatTons(stats.totalFoodScrapsDiverted)} Tons
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">Tons of Food Scraps Diverted</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Food Scraps Diverted <sup><small><a href="#footnote1-scraps">[1]</a></small></sup></div>
             </div>
           </div>
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
-                {formatNumber(stats.totalMethaneReduced, 2)}
+                {formatNumber(stats.totalMethaneReduced, 2)} Tons
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">Tons of Methane Production Reduced</div>
-              <div className="text-xs md:text-sm text-gray-500 mt-0.5">EPA methodology (avoided landfilled food waste)</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Methane Production Reduced <sup><small><a href="#footnote2-methane">[2]</a></small></sup></div>
+              {/*<div className="text-xs md:text-sm text-gray-500 mt-0.5">EPA methodology (avoided landfilled food waste)</div>*/}
             </div>
           </div>
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
-                {formatNumber(stats.co2Saved, 0)}
+                {formatNumber(stats.co2Saved, 0)} Lbs. CO<sub>2</sub>
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">Lbs. CO₂ Saved (EPA Estimate)</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Saved <sup><small><a href="#footnote3-co2gas">[3]</a></small></sup></div>
+              {/*<div className="text-xs md:text-sm text-gray-500 mt-0.5">EPA Estimate *</div>*/}
             </div>
           </div>
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
-                {formatNumber(stats.gasConserved, 1)}
+                {formatNumber(stats.gasConserved, 1)} Gallons
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">Gallons Gas Conserved (transportation savings)</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Fuel Conserved <sup><small><a href="#footnote3-co2gas">[3]</a></small></sup></div>
+              {/*<div className="text-xs md:text-sm text-gray-500 mt-0.5">Transportation savings <sup><small><a href="#footnote3-co2gas">[3]</a></small></sup></div>*/}
             </div>
           </div>
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
-                {formatNumber(stats.totalCompostCreated, 0)}
+                {formatNumber(stats.totalCompostCreated, 0)} Gallons
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">Gallons Compost Created</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Compost Created</div>
             </div>
           </div>
         </div>
@@ -304,41 +306,43 @@ export function ImpactStatistics() {
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
-                {formatNumber(stats.yearToDateParticipants)}
+                {formatNumber(stats.yearToDateParticipants)} Members
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">DCCI Participants</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Participating</div>
             </div>
           </div>
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
-                {formatNumber(stats.yearToDateFoodScraps, 0)}
+                {formatNumber(stats.yearToDateFoodScraps, 0)} Lbs.
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">Est. Food Scraps Diverted (lbs)</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Food Scraps Diverted <sup><small><a href="#footnote1-scraps">[1]</a></small></sup></div>
             </div>
           </div>
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
-                {formatNumber(stats.yearToDateCo2, 0)}
+                {formatNumber(stats.yearToDateCo2, 0)} Lbs. CO<sub>2</sub>
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">Lbs. CO₂ Saved (EPA Estimate)</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Saved <sup><small><a href="#footnote3-co2gas">[3]</a></small></sup></div>
+              {/*<div className="text-xs md:text-sm text-gray-500 mt-0.5">EPA Estimate *</div>*/}
             </div>
           </div>
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
-                {formatNumber(stats.yearToDateGas, 1)}
+                {formatNumber(stats.yearToDateGas, 1)} Gallons
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">Gallons Gas Conserved (transportation savings)</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Fuel Conserved <sup><small><a href="#footnote3-co2gas">[3]</a></small></sup></div>
+              {/*<div className="text-xs md:text-sm text-gray-500 mt-0.5">Transportation savings <sup><small><a href="#footnote3-co2gas">[3]</a></small></sup></div>*/}
             </div>
           </div>
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
             <div className="text-center">
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
-                {formatNumber(stats.yearToDateCompost, 0)}
+                {formatNumber(stats.yearToDateCompost, 0)} Gallons
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">Gallons Compost Created</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Compost Created</div>
             </div>
           </div>
         </div>
@@ -348,16 +352,18 @@ export function ImpactStatistics() {
       <div className="mt-6 md:mt-8 bg-blue-50 border border-blue-200 rounded-xl p-4 md:p-6">
         <h4 className="text-sm md:text-base font-semibold text-blue-800 mb-2">Methodology & Estimates</h4>
         <div className="text-sm md:text-base text-blue-700 space-y-2">
-          <p>
-            <strong>Food Scraps Diverted:</strong> EPA-aligned estimate (98% of greens as food scraps, 100% diverted from landfill).
-          </p>
-          <p>
-            <strong>Methane Reduced:</strong> Based on EPA methodology for avoided landfilled food waste. See{" "}
-            <a href="https://www.epa.gov/land-research/quantifying-methane-emissions-landfilled-food-waste" target="_blank" rel="noreferrer noopener" className="underline">EPA Quantifying Methane Emissions from Landfilled Food Waste</a>.
-          </p>
-          <p>
-            <strong>CO₂ & Gas:</strong> EPA estimate for CO₂; transportation savings for gas conserved. Approximations for educational purposes.
-          </p>
+          <ol className="list-decimal ml-4">
+            <li id="footnote1-scraps">
+              <strong>Food Scraps Diverted:</strong> EPA-aligned estimate (98% of greens as food scraps, 100% diverted from landfill).
+            </li>
+            <li id="footnote2-methane">
+              <strong>Methane Reduced:</strong> Based on EPA methodology for avoided landfilled food waste. See{" "}
+              <a href="https://www.epa.gov/land-research/quantifying-methane-emissions-landfilled-food-waste" target="_blank" rel="noreferrer noopener" className="underline">EPA Quantifying Methane Emissions from Landfilled Food Waste</a>.
+            </li>
+            <li id="footnote3-co2gas">
+              <strong>CO<sub>2</sub> & Gas:</strong> EPA estimate for CO<sub>2</sub>; transportation savings for fuel conserved. Approximations for educational purposes.
+            </li>
+          </ol>
           <p>
             <strong>Data:</strong> All statistics from actual form submissions in the DCCI database.
           </p>

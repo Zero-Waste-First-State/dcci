@@ -38,11 +38,11 @@ export default function Home() {
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6 md:p-8 shadow-lg w-full max-w-4xl">
               <div className="flex flex-row items-center justify-between gap-4 md:gap-6">
                 <Image
-                  src="/pfd-logo.jpg"
+                  src="/pfde-logo-transparent.png"
                   alt="Plastic Free Delaware"
                   width={80}
-                  height={80}
-                  className="rounded-lg shadow-md object-contain flex-shrink-0"
+                  height={81}
+                  className="h-auto rounded-lg shadow-md object-contain flex-shrink-0"
                 />
                 <div className="text-center flex-1 min-w-0">
                   <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-700 mb-2 leading-tight">
@@ -55,11 +55,11 @@ export default function Home() {
                   </p>
                 </div>
                 <Image
-                  src="/zwfs-logo.png"
+                  src="/zwfs-logo-transparent.png"
                   alt="Zero Waste First State"
                   width={80}
                   height={80}
-                  className="rounded-lg shadow-md object-contain flex-shrink-0"
+                  className="h-auto rounded-lg shadow-md object-contain flex-shrink-0"
                 />
               </div>
             </div>
@@ -72,6 +72,7 @@ export default function Home() {
             {/* Get Started Section */}
             <div className="bg-gradient-to-br from-blue-50 to-teal-50 border-2 border-blue-200 rounded-2xl p-6 md:p-8 shadow-lg w-full max-w-3xl mx-auto">
               <div className="text-center mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold text-blue-700 mb-3 leading-tight">Participating Members:</h2>
                 <h2 className="text-2xl md:text-3xl font-bold text-blue-700 mb-3 leading-tight">Ready to Log Your Compost Data?</h2>
                 <p className="text-base md:text-lg text-blue-600 mb-2">Help us track composting efforts and make a positive impact</p>
                 <p className="text-sm text-gray-600">Click below to start recording your composting activities</p>
@@ -88,27 +89,6 @@ export default function Home() {
                   <span className="hidden sm:inline">Start Compost Records Form</span>
                   <span className="sm:hidden">Start Form</span>
                 </Link>
-              </div>
-              
-              <div className="mt-6 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 text-sm text-gray-500">
-                <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  Quick & Easy
-                </div>
-                <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  Secure Data
-                </div>
-                <div className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  Environmental Impact
-                </div>
               </div>
             </div>
             
@@ -153,7 +133,7 @@ export default function Home() {
             
             {/* Original Footer Content */}
             <div className="flex items-center justify-center text-xs gap-8">
-              <p>
+              {/*<p>
                 Powered by{" "}
                 <a
                   href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
@@ -163,7 +143,7 @@ export default function Home() {
                 >
                   Supabase
                 </a>
-              </p>
+              </p>*/}
               <ThemeSwitcher />
             </div>
           </div>

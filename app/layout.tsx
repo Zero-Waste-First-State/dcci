@@ -11,14 +11,14 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: 'DCCI',
+  title: 'Delaware Community Composting Initiative | Plastic Free Delaware',
   description: 'Delaware Community Composting Initiative - Data Collection Platform',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
+
+  icons: {
+    icon:     '/icons/favicon.ico',
+    shortcut: '/icons/favicon-32x32.png',
+    apple:    '/icons/apple-touch-icon.png',
+  }
 };
 
 const geistSans = Geist({

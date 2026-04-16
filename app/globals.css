@@ -83,3 +83,7 @@
     }
   }
 }
+
+sup small a {
+  border-bottom: 1px dashed gray;
+}
