@@ -1,4 +1,4 @@
-name: Deploy Migrations to Staging
+name: Deploy Migrations to Staging (Preview)
 
 on:
   push:
@@ -22,5 +22,5 @@ jobs:
         with:
           version: latest
 
-      - run: supabase link --project-ref $SUPABASE_PROJECT_ID
+      - run: supabase link --project-ref ${{ vars.STAGING_PROJECT_ID }}
       - run: supabase db push
