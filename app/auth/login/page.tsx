@@ -23,7 +23,7 @@ export default function Page() {
                     height={40}
                     className="rounded-lg"
                   />
-                  <span className="text-lg font-bold text-green-700">DCCI X Hack4Impact</span>
+                  <span className="text-lg font-bold text-green-700">DCCI Dashboard</span>
                 </Link>
               </div>
               <div className="flex gap-4 items-center">
