@@ -6,6 +6,7 @@ import { AddingMaterialTable } from "@/components/adding-material-table";
 import { MeasurementsTable } from "@/components/measurements-table";
 import { IssuesTable } from "@/components/issues-table";
 import { MovingBinsTable } from "@/components/moving-bins-table";
+import { MixingBinsTable } from "@/components/mixing-bins-table";
 import { FinishedCompostTable } from "@/components/finished-compost-table";
 import { BrownsBinTable } from "@/components/browns-bin-table";
 import { ContaminationTable } from "@/components/contamination-table";
@@ -55,6 +56,15 @@ interface MovingDay {
   move_bin2_bin3?: boolean;
   move_bin3_bin4?: boolean;
   move_bin4_steel_bins?: boolean;
+}
+
+interface MixingBins {
+  mixing_id: number;
+  submission_id: number;
+  mix_bin1?: boolean;
+  mix_bin2?: boolean;
+  mix_bin3?: boolean;
+  mix_bin4?: boolean;
 }
 
 interface FinishedCompost {
@@ -167,6 +177,12 @@ export function FormSubmissionsTable() {
             .select('*')
             .eq('submission_id', submissionId);
 
+          // Fetch mixing bins
+          const { data: mixingBins, error: mixingBinsError } = await supabase
+            .from('Mixing Bins')
+            .select('*')
+            .eq('submission_id', submissionId);
+
           // Fetch finished compost
           const { data: finishedCompost, error: finishedCompostError } = await supabase
             .from('Finished Compost')
@@ -195,6 +211,7 @@ export function FormSubmissionsTable() {
           if (measurementsError) console.error('Measurements error:', measurementsError);
           if (addingMaterialError) console.error('Adding Material error:', addingMaterialError);
           if (movingDayError) console.error('Moving Day error:', movingDayError);
+          if (mixingBinsError) console.error('Mixing Bins error:', mixingBinsError);
           if (finishedCompostError) console.error('Finished Compost error:', finishedCompostError);
           if (brownsBinError) console.error('Browns Bin error:', brownsBinError);
           if (issuesError) console.error('Issues error:', issuesError);
@@ -205,6 +222,7 @@ export function FormSubmissionsTable() {
             measurements: measurements?.length || 0,
             addingMaterial: addingMaterial?.length || 0,
             movingDay: movingDay?.length || 0,
+            mixingBins: mixingBins?.length || 0,
             finishedCompost: finishedCompost?.length || 0,
             brownsBin: brownsBin?.length || 0,
             issues: issues?.length || 0,
@@ -217,6 +235,7 @@ export function FormSubmissionsTable() {
             measurements: measurements || [],
             adding_material: addingMaterial || [],
             moving_day: movingDay || [],
+            mixing_bins: mixingBins || [],
             finished_compost: finishedCompost || [],
             browns_bin: brownsBin || [],
             issues: issues || [],
@@ -268,6 +287,7 @@ export function FormSubmissionsTable() {
     if (submission.measurements?.length) tasks.push('Measurements');
     if (submission.adding_material?.length) tasks.push('Adding Material');
     if (submission.moving_day?.length) tasks.push('Moving Day');
+    if (submission.mixing_bins?.length) tasks.push('Mixing Bins');
     if (submission.finished_compost?.length) tasks.push('Finished Compost');
     if (submission.browns_bin?.length) tasks.push('Browns Bin');
     if (submission.litter?.length) tasks.push('Contamination');
@@ -416,6 +436,8 @@ export function FormSubmissionsTable() {
         return <IssuesTable highlightedEntryId={highlightedEntryId} onEntryHighlighted={setHighlightedEntryId} />;
       case 'moving_day':
         return <MovingBinsTable highlightedEntryId={highlightedEntryId} onEntryHighlighted={setHighlightedEntryId} />;
+      case 'mixing_bins':
+        return <MixingBinsTable highlightedEntryId={highlightedEntryId} onEntryHighlighted={setHighlightedEntryId} />;
       case 'finished_compost':
         return <FinishedCompostTable highlightedEntryId={highlightedEntryId} onEntryHighlighted={setHighlightedEntryId} />;
       case 'browns_bin':
@@ -563,6 +585,29 @@ export function FormSubmissionsTable() {
               {activeFilter === 'moving_day' ? 'Moving Bins (Click again for table)' : 'Moving Bins'}
             </div>
           </button>
+
+          <button
+            onClick={() => {
+              if (activeFilter === 'mixing_bins') {
+                // Second click - show dynamic table
+                handleDoubleClick('mixing_bins');
+              } else {
+                // First click - apply filter
+                handleFilterClick('mixing_bins');
+              }
+            }}
+            className={`bg-white p-4 rounded-lg shadow transition-all duration-200 hover:shadow-lg ${
+              activeFilter === 'mixing_bins' ? 'ring-2 ring-blue-500 hover:bg-blue-50' : 'hover:bg-blue-50'
+            }`}
+          >
+            <div className="text-2xl font-bold text-indigo-600">
+              {submissions.filter(s => s.mixing_bins?.length).length}
+            </div>
+            <div className="text-gray-600">
+              {activeFilter === 'mixing_bins' ? 'Mixing Bins (Click again for table)' : 'Mixing Bins'}
+            </div>
+          </button>
+
           <button 
             onClick={() => {
               if (activeFilter === 'finished_compost') {
@@ -1094,6 +1139,46 @@ export function FormSubmissionsTable() {
                              onClick={() => navigateToSpecificEntry('moving_day', moving.moving_id)}
                              className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200 transition-colors ml-2"
                              title="View this specific moving day entry in table"
+                           >
+                             View This Entry
+                           </button>
+                         </div>
+                       </div>
+                     ))}
+                   </div>
+                 )}
+
+                 {/* Mixing Bins */}
+                 {selectedSubmission.mixing_bins && selectedSubmission.mixing_bins.length > 0 && (
+                   <div>
+                     <div className="flex justify-between items-center mb-2">
+                       <h4 className="text-md font-medium text-black">Mixing Bins</h4>
+                       <button
+                         onClick={() => {
+                           setSelectedSubmission(null);
+                           setDynamicTable('mixing_bins');
+                           setActiveFilter('mixing_bins');
+                           setHighlightedEntryId(null);
+                         }}
+                         className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200 transition-colors"
+                         title="View all mixing bins entries in table"
+                       >
+                         View All in Table
+                       </button>
+                     </div>
+                     {selectedSubmission.mixing_bins.map((mixing) => (
+                       <div key={mixing.mixing_id} className="bg-blue-50 p-3 rounded border border-blue-200 text-black">
+                         <div className="flex justify-between items-start mb-2">
+                           <div className="flex-1">
+                             {mixing.mix_bin1 && <p>• Mixed Bin 1</p>}
+                             {mixing.mix_bin2 && <p>• Mixed Bin 2</p>}
+                             {mixing.mix_bin3 && <p>• Mixed Bin 3</p>}
+                             {mixing.mix_bin4 && <p>• Mixed Bin 4</p>}
+                           </div>
+                           <button
+                             onClick={() => navigateToSpecificEntry('mixing_bins', mixing.mixing_id)}
+                             className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200 transition-colors ml-2"
+                             title="View this specific mixing bins entry in table"
                            >
                              View This Entry
                            </button>

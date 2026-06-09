@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { parseFormDataFromURL, type FormData } from "@/lib/utils";
-
 import { FaArrowRight } from "react-icons/fa";
 
 interface AdditionalTasksProps {
@@ -22,6 +21,7 @@ export default function AdditionalTasks({ searchParams }: AdditionalTasksProps) 
     addMaterial: false,
     measureBin: false,
     moveBins: false,
+    mixBins: false,
     finishedCompost: false
   });
   const [message, setMessage] = useState("");
@@ -70,6 +70,7 @@ export default function AdditionalTasks({ searchParams }: AdditionalTasksProps) 
       taskData.addMaterial,
       taskData.measureBin,
       taskData.moveBins,
+      taskData.mixBins,
       taskData.finishedCompost
     ].filter(Boolean);
 
@@ -102,6 +103,8 @@ export default function AdditionalTasks({ searchParams }: AdditionalTasksProps) 
       router.push(`/compost-form/task-selection/measuring-bin?${params.toString()}`);
     } else if (taskData.moveBins) {
       router.push(`/compost-form/task-selection/moving-bins?${params.toString()}`);
+    } else if (taskData.mixBins) {
+      router.push(`/compost-form/task-selection/mixing-bins?${params.toString()}`);
     } else if (taskData.finishedCompost) {
       router.push(`/compost-form/task-selection/finished-compost?${params.toString()}`);
     }
@@ -116,6 +119,7 @@ export default function AdditionalTasks({ searchParams }: AdditionalTasksProps) 
         addMaterial: field === 'addMaterial',
         measureBin: field === 'measureBin',
         moveBins: field === 'moveBins',
+        mixBins: field === 'mixBins',
         finishedCompost: field === 'finishedCompost'
       });
     } else {
@@ -130,6 +134,7 @@ export default function AdditionalTasks({ searchParams }: AdditionalTasksProps) 
       taskData.addMaterial,
       taskData.measureBin,
       taskData.moveBins,
+      taskData.mixBins,
       taskData.finishedCompost
     ].filter(Boolean);
     return selectedTasks.length <= 1; // Valid if 0 or 1 tasks selected
@@ -246,6 +251,29 @@ export default function AdditionalTasks({ searchParams }: AdditionalTasksProps) 
               }}
             >
               Move Bins
+            </button>
+
+            <button
+              type="button"
+              onClick={() => updateTaskData('mixBins', !taskData.mixBins)}
+              style={{
+                width: "100%",
+                height: "57px",
+                borderRadius: "16px",
+                backgroundColor: taskData.mixBins ? "#758A48" : "#FFFFFF",
+                border: "1px solid #758A48",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                fontSize: "20px",
+                fontWeight: "bold",
+                fontFamily: "PT Sans, sans-serif",
+                color: taskData.mixBins ? "#FFFFFF" : "#758A48", // white if clicked, green if not
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              Mix Bins
             </button>
 
             <button

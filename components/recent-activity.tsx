@@ -38,6 +38,7 @@ export function RecentActivity() {
           Measurements(bin_type),
           "Adding Material"(bin_id),
           "Moving Day"(moving_id),
+          "Mixing Bins"(mixing_id),
           "Finished Compost"(compost_id),
           "Browns Bin"(browns_id),
           Issues(issue_id),
@@ -83,6 +84,17 @@ export function RecentActivity() {
           activityRecords.push({
             id: `moving-${submission.submission_id}`,
             activity: "Moving Bins",
+            date_time: dateTime,
+            site: siteName,
+            user: userName,
+            submission_id: submission.submission_id
+          });
+        }
+
+        if (submission["Mixing Bins"] && submission["Mixing Bins"].length > 0) {
+          activityRecords.push({
+            id: `mixing-${submission.submission_id}`,
+            activity: "Mixing Bins",
             date_time: dateTime,
             site: siteName,
             user: userName,

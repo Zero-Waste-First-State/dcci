@@ -41,6 +41,11 @@ interface TaskData {
   moveBin4SteelBins?: boolean;
   // Finished Compost specific fields
   gallonsTaken?: string;
+  // Mixing Bins specific fields
+  mixBin1?: boolean;
+  mixBin2?: boolean;
+  mixBin3?: boolean;
+  mixBin4?: boolean;
 }
 
 interface IssueData {
@@ -209,7 +214,13 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
     fetchSiteName(data.site).then(name => setSiteName(name));
 
     // Load all task data from localStorage for this submission
-    const taskTypes = ['add_material', 'measure_bin', 'move_bins', 'finished_compost'];
+    const taskTypes = [
+      'add_material',
+      'measure_bin',
+      'move_bins',
+      'mix_bins',
+      'finished_compost'
+    ];
     const allTaskData: Record<string, TaskData | TaskData[]> = {};
     
     taskTypes.forEach(taskType => {
@@ -218,8 +229,8 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
         try {
           const taskData = JSON.parse(savedData);
           
-          // For moving bins, ensure it's always treated as an array for consistent display
-          if (taskType === 'move_bins' && !Array.isArray(taskData)) {
+          // For moving or mixing bins, ensure it's always treated as an array for consistent display
+          if (['move_bins', 'mix_bins'].includes(taskType) && !Array.isArray(taskData)) {
             // Convert single moving bins task to array format
             allTaskData[taskType] = [taskData];
           } else {
@@ -303,7 +314,7 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
            for (const taskData of tasksToProcess) {
              let insertData: Record<string, unknown> = { submission_id: newSubmissionId };
 
-                         switch (taskId) {
+             switch (taskId) {
                case 'measure_bin':
                  // Insert into Measurements table
                  insertData = {
@@ -329,7 +340,7 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
                  console.log("Measurement data inserted successfully");
                  break;
 
-                                                           case 'add_material':
+               case 'add_material':
                  if (taskData.binType === 'browns') {
                    // Insert into Browns Bin table
                    insertData = {
@@ -372,7 +383,7 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
                   }
                  break;
 
-                                                           case 'move_bins':
+               case 'move_bins':
                  // Insert into Moving Day table
                  insertData = {
                    submission_id: newSubmissionId,
@@ -390,7 +401,25 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
                  console.log("Moving bins data inserted successfully");
                  break;
 
-                                                           case 'finished_compost':
+               case 'mix_bins':
+                 // Insert into Mixing Bins table
+                 insertData = {
+                   submission_id: newSubmissionId,
+                   mix_bin1: taskData.mixBin1 || false,
+                   mix_bin2: taskData.mixBin2 || false,
+                   mix_bin3: taskData.mixBin3 || false,
+                   mix_bin4: taskData.mixBin4 || false,
+                 };
+                 console.log("Inserting mixing bins data:", insertData);
+                 const { error: mixError } = await supabase.from("Mixing Bins").insert(insertData);
+                 if (mixError) {
+                   console.error("Error inserting mixing bins data:", mixError);
+                   throw new Error(`Failed to insert mixing bins data: ${mixError.message}`);
+                 }
+                 console.log("Mixing bins data inserted successfully");
+                 break;
+
+               case 'finished_compost':
                  // Insert into Finished Compost table
                  insertData = {
                    submission_id: newSubmissionId,
@@ -509,6 +538,8 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
         return 'Measure Bin';
       case 'move_bins':
         return 'Move Bins';
+      case 'mix_bin':
+        return 'Mix Bins'
       case 'finished_compost':
         return 'Taking Compost';
       default:
@@ -588,6 +619,16 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
             {taskData.moveBin2Bin3 && <p><strong>Moved:</strong> Bin 2 → Bin 3</p>}
             {taskData.moveBin3Bin4 && <p><strong>Moved:</strong> Bin 3 → Bin 4</p>}
             {taskData.moveBin4SteelBins && <p><strong>Moved:</strong> Bin 4 → Steel Bins</p>}
+          </div>
+        );
+
+      case 'mix_bins':
+        return (
+          <div style={{ fontSize: "14px", color: "#000000", lineHeight: "1.4" }}>
+            {taskData.mixBin1 && <p><strong>Mixed:</strong> Bin 1</p>}
+            {taskData.mixBin2 && <p><strong>Mixed:</strong> Bin 2</p>}
+            {taskData.mixBin3 && <p><strong>Mixed:</strong> Bin 3</p>}
+            {taskData.mixBin4 && <p><strong>Mixed:</strong> Bin 3</p>}
           </div>
         );
 
@@ -1961,6 +2002,102 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
                        }}
                      >
                        Move Bin 4 to Steel Bins
+                     </button>
+                   </div>
+                 </div>
+               </div>
+             )}
+
+             {editingTaskType === 'mix_bins' && (
+               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                 <div>
+                   <p
+                     style={{
+                       fontSize: "16px",
+                       marginBottom: "10px",
+                       fontFamily: "PT Sans, sans-serif",
+                       color: "#000000",
+                       fontWeight: "bold",
+                     }}
+                   >
+                     Select which bins were moved:
+                   </p>
+                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                     <button
+                       type="button"
+                       onClick={() => setEditFormData({ ...editFormData, mixBin1: !editFormData.mixBin1 })}
+                       style={{
+                         width: "100%",
+                         height: "48px",
+                         borderRadius: "24px",
+                         backgroundColor: editFormData.mixBin1 ? "#899D5E" : "#FFFFFF",
+                         border: "2px solid #899D5E",
+                         boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                         fontSize: "16px",
+                         fontWeight: "bold",
+                         fontFamily: "PT Sans, sans-serif",
+                         color: editFormData.mixBin1 ? "#FFFFFF" : "#899D5E",
+                         cursor: "pointer",
+                       }}
+                     >
+                       Mix Bin 1
+                     </button>
+                     <button
+                       type="button"
+                       onClick={() => setEditFormData({ ...editFormData, mixBin2: !editFormData.mixBin2 })}
+                       style={{
+                         width: "100%",
+                         height: "48px",
+                         borderRadius: "24px",
+                         backgroundColor: editFormData.mixBin2 ? "#899D5E" : "#FFFFFF",
+                         border: "2px solid #899D5E",
+                         boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                         fontSize: "16px",
+                         fontWeight: "bold",
+                         fontFamily: "PT Sans, sans-serif",
+                         color: editFormData.mixBin2 ? "#FFFFFF" : "#899D5E",
+                         cursor: "pointer",
+                       }}
+                     >
+                       Mix Bin 2
+                     </button>
+                     <button
+                       type="button"
+                       onClick={() => setEditFormData({ ...editFormData, mixBin3: !editFormData.mixBin3 })}
+                       style={{
+                         width: "100%",
+                         height: "48px",
+                         borderRadius: "24px",
+                         backgroundColor: editFormData.mixBin3 ? "#899D5E" : "#FFFFFF",
+                         border: "2px solid #899D5E",
+                         boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                         fontSize: "16px",
+                         fontWeight: "bold",
+                         fontFamily: "PT Sans, sans-serif",
+                         color: editFormData.mixBin3 ? "#FFFFFF" : "#899D5E",
+                         cursor: "pointer",
+                       }}
+                     >
+                       Mix Bin 3
+                     </button>
+                     <button
+                       type="button"
+                       onClick={() => setEditFormData({ ...editFormData, mixBin4: !editFormData.mixBin4 })}
+                       style={{
+                         width: "100%",
+                         height: "48px",
+                         borderRadius: "24px",
+                         backgroundColor: editFormData.mixBin4 ? "#899D5E" : "#FFFFFF",
+                         border: "2px solid #899D5E",
+                         boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+                         fontSize: "16px",
+                         fontWeight: "bold",
+                         fontFamily: "PT Sans, sans-serif",
+                         color: editFormData.mixBin4 ? "#FFFFFF" : "#899D5E",
+                         cursor: "pointer",
+                       }}
+                     >
+                       Mix Bin 4
                      </button>
                    </div>
                  </div>

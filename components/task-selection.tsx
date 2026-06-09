@@ -1,7 +1,9 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowRight, FaCheck, FaCheckDouble, FaExclamationCircle } from "react-icons/fa";
+import TasksAvailable from "@/components/tasks-available";
 
 interface TaskSelectionProps {
   siteId: number;
@@ -11,9 +13,34 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [taskSet, setTaskSet] = useState<string>("primary");
   const [selectedTask, setSelectedTask] = useState<string>("");
   const [message, setMessage] = useState("");
   const router = useRouter();
+
+  const tasksAvailable = {
+    primary: [
+      { id: "add_material", icon: FaCheck, label: "Add Material to Bin", path: "adding-material" },
+      // { id: "dropoff_grounds", label: "Drop Off Coffee Grounds", path: 'dropoff-grounds'}, // roll into "add material" task
+      { id: "measure_bin", icon: FaCheck, label: "Measure Bin", path: "measuring-bin" },
+      { id: "move_bins", icon: FaCheck, label: "Move Bins", path: "moving-bins" },
+      { id: "finished_compost", icon: FaCheck, label: "Taking Finished Compost", path: "finished-compost" },
+      { id: "report_issue", icon: FaExclamationCircle, label: "Report Contamination/Issue", path: "litter-page" },
+      { id: "other_tasks", icon: FaCheckDouble, label: "More tasks...", path: "other-tasks"},
+    ],
+
+    other: [
+      { id: "mix_bins", icon: FaCheck, label: "Mix Bins", path: "mixing-bins"},
+      // { id: "add_water", icon: FaCheck, label: "Add Water to Bin", path: 'adding-water'},
+      // { id: "replenish_water", icon: FaCheck, label: "Fill Water Jugs or Bring Water to Barrel", path: 'replenish-water'},
+      // { id: "sift_compost", icon: FaCheck, label: "Sifting Finished Compost", path: 'sift-compost'},
+    ]
+  };
+
+  const activeTaskSet = taskSet === 'primary'
+    ? tasksAvailable.primary
+    : tasksAvailable.other
+  ;
 
   // Load saved data
   useEffect(() => {
@@ -48,13 +75,18 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
 
   const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const taskOptions = [
-    { id: "add_material", label: "Add Material to Bin", path: "adding-material" },
-    { id: "measure_bin", label: "Measure Bin", path: "measuring-bin" },
-    { id: "move_bins", label: "Move Bins", path: "moving-bins" },
-    { id: "finished_compost", label: "Finished Compost", path: "finished-compost" },
-    { id: "report_issue", label: "Report Contamination/Issue", path: "litter-page" },
-  ];
+  const handleTaskSelected = (task) => {
+    // console.log(`receiving task selection (${task}) from child task-selection component`);
+
+    if (task === 'other_tasks') {
+      //console.log('render other tasks');
+      setTaskSet('other_tasks');
+      setSelectedTask('');
+    }
+    else {
+      setSelectedTask(task);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +105,8 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
       submissionId: `temp_${Date.now()}`
     });
 
-    const task = taskOptions.find(task => task.id === selectedTask);
+    const task = activeTaskSet.find(task => task.id === selectedTask);
+
     if (task) {
       // Special case: Report Contamination/Issue skips directly to litter page
       if (selectedTask === "report_issue") {
@@ -93,7 +126,10 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
     setMessage("Form data cleared. You can start a new submission.");
   };
 
-  const isFormValid = firstName.trim() && lastName.trim() && email.trim() && selectedTask && isValidEmail(email.trim());
+  const isFormValid = firstName.trim() && lastName.trim()
+    && email.trim() && isValidEmail(email.trim())
+    && selectedTask
+  ;
 
   const COLORS = {
     green: "#758A48",
@@ -194,35 +230,14 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
         {/* Task Buttons */}
         <div style={{ marginBottom: "30px" }}>
           <p style={{ fontSize: "24px", fontWeight: "bold", color: COLORS.green, marginBottom: "15px", textAlign: "center", fontFamily: "PT Sans, sans-serif" }}>
-            Select a Task to Perform:
+            Select a Task:
           </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-            {taskOptions.map(task => {
-              const isSelected = selectedTask === task.id;
-              return (
-                <button
-                  key={task.id}
-                  type="button"
-                  onClick={() => setSelectedTask(task.id)}
-                  style={{
-                    width: "100%",
-                    height: "65px",
-                    borderRadius: "26px",
-                    border: `1px solid ${COLORS.green}`,
-                    backgroundColor: isSelected ? COLORS.green : COLORS.white,
-                    color: isSelected ? COLORS.white : COLORS.green,
-                    fontFamily: "PT Sans, sans-serif",
-                    fontSize: "20px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  {task.label}
-                </button>
-              );
-            })}
-          </div>
+
+          <TasksAvailable
+            taskSet={activeTaskSet}
+            onSelect={handleTaskSelected}
+          />
+
         </div>
 
         {message && (
