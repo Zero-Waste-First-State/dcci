@@ -33,7 +33,7 @@ export default function ThankYouPage() {
                     height={40}
                     className="rounded-lg"
                   />
-                  <span className="text-lg font-bold text-green-700">DCCI X Hack4Impact</span>
+                  <span className="text-lg font-bold text-green-700">DCCI</span>
                 </div>
               </div>
             </div>
