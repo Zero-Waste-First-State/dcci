@@ -1,10 +1,14 @@
-name: Deploy Migrations to Staging (Preview)
+name: Run Supabase Schema Migrations on Staging (Preview)
 
 on:
   push:
     branches:
       - staging
+
   workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   deploy:
@@ -18,11 +22,14 @@ jobs:
       SUPABASE_PROJECT_ID: ${{ vars.STAGING_PROJECT_ID }}
 
     steps:
+      - name: Code Checkout
       - uses: actions/checkout@v4
 
-      - uses: supabase/setup-cli@v1
+      - name: Supabase CLI Setup
+      - uses: supabase/setup-cli@v2
         with:
           version: latest
 
       - run: supabase link --project-ref ${{ vars.STAGING_PROJECT_ID }}
+      #- run: supabase db reset
       - run: supabase db push

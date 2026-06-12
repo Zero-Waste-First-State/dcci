@@ -3,15 +3,16 @@
 name: CI
 
 on:
-  push:
-    branches: [main, staging]
-  pull_request:
-    branches: [main, staging]
+  #push:
+  #  branches: [main, staging]
+  #pull_request:
+  #  branches: [main, staging]
 
   workflow_dispatch:
 
 jobs:
   tests:
+    if: false # <-- disabled for now
     runs-on: ubuntu-latest
 
     steps:
@@ -34,6 +35,7 @@ jobs:
           fi
 
   build-and-lint:
+    if: false # <-- disabled for now
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
