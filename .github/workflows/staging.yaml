@@ -23,10 +23,10 @@ jobs:
 
     steps:
       - name: Code Checkout
-      - uses: actions/checkout@v4
+        uses: actions/checkout@v4
 
       - name: Supabase CLI Setup
-      - uses: supabase/setup-cli@v2
+        uses: supabase/setup-cli@v2
         with:
           version: latest
 
