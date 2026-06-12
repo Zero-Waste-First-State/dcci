@@ -17,9 +17,9 @@ ALTER TABLE "public"."Mixing Bins" ADD CONSTRAINT "Mixing Bins_submission_id_fke
 
 ALTER TABLE "public"."Mixing Bins" VALIDATE CONSTRAINT "Mixing Bins_submission_id_fkey";
 
-REVOKE ALL ON TABLE public.profiles FROM anon, authenticated;
+REVOKE ALL ON TABLE "public"."Mixing Bins" FROM anon, authenticated;
 
-GRANT ALL ON TABLE public.profiles TO service_role;
+GRANT ALL ON TABLE "public"."Mixing Bins" TO service_role;
 
 CREATE POLICY "Allow insert for Mixing Bins"
   on "public"."Mixing Bins"
