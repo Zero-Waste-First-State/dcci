@@ -1,19 +1,21 @@
 # DCCI – CI workflow: build and lint on push/PR so deployments stay safe
 # Deployment itself is handled by Vercel (or your host) via Git integration.
-name: CI
+name: Continuous Integration (CI)
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, staging]
+
   pull_request:
-    branches: [main, master]
+    branches: [main, staging]
 
 jobs:
   build-and-lint:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Code Checkout
+        uses: actions/checkout@v6
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -21,13 +23,13 @@ jobs:
           node-version: "20"
           cache: "npm"
 
-      - name: Install dependencies
+      - name: Install Node Package Dependencies
         run: npm ci
 
-      - name: Lint
+      - name: Lint Code
         run: npm run lint
 
-      - name: Build
+      - name: Build Project
         run: npm run build
         env:
           # Build may need these; use placeholder if no secrets in repo
