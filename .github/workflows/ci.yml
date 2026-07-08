@@ -1,6 +1,6 @@
 # DCCI – CI workflow: build and lint on push/PR so deployments stay safe
 # Deployment itself is handled by Vercel (or your host) via Git integration.
-name: CI
+name: Continuous Integration (CI)
 
 on:
   #push:
@@ -16,9 +16,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Code Checkout
+        uses: actions/checkout@v6
 
-      - uses: supabase/setup-cli@v1
+      - name: Supabase CLI Setup
+        uses: supabase/setup-cli@v2
         with:
           version: latest
 
@@ -37,9 +39,10 @@ jobs:
   build-and-lint:
     if: false # <-- disabled for now
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Code Checkout
+        uses: actions/checkout@v6
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -47,13 +50,13 @@ jobs:
           node-version: "20"
           cache: "npm"
 
-      - name: Install dependencies
+      - name: Install Node Package Dependencies
         run: npm ci
 
-      - name: Lint
+      - name: Lint Code
         run: npm run lint
 
-      - name: Build
+      - name: Build Project
         run: npm run build
         env:
           # Build may need these; use placeholder if no secrets in repo

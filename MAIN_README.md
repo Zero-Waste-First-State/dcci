@@ -183,27 +183,27 @@ The application consists of two main interfaces:
 
 ### Deployment
 - **Vercel** - Frontend hosting
-- **Custom Domain** - h4i.plasticfreedelaware.org
+- **Custom Domain** - dcci.plasticfreedelaware.org
 - **Email Service** - AWS SES via Resend
 
 ## Project Structure
 
 ```
-dcci-h4i/
-├── app/                          # Next.js App Router pages
+dcci/
+├── app/                         # Next.js App Router pages
 │   ├── compost-form/            # Public user forms
 │   ├── dashboard/               # Staff dashboard
 │   ├── auth/                    # Authentication pages
 │   └── api/                     # API routes
-├── components/                   # React components
+├── components/                  # React components
 │   ├── ui/                      # shadcn/ui components
 │   └── tutorial/                # Onboarding components
 ├── lib/                         # Utility functions
-│   ├── supabase/               # Supabase client configuration
-│   ├── email.ts                # Email utilities
-│   └── utils.ts                # General utilities
+│   ├── supabase/                # Supabase client configuration
+│   ├── email.ts                 # Email utilities
+│   └── utils.ts                 # General utilities
 ├── supabase/                    # Supabase configuration
-│   └── functions/              # Edge Functions
+│   └── functions/               # Edge Functions
 └── public/                      # Static assets
 ```
 
@@ -248,7 +248,7 @@ dcci-h4i/
 
 ### Production Environment
 - **Frontend**: Deployed on Vercel
-- **Domain**: h4i.plasticfreedelaware.org
+- **Domain**: dcci.plasticfreedelaware.org
 - **Database**: Supabase hosted PostgreSQL
 - **Email**: AWS SES configuration
 
@@ -292,6 +292,6 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 ---
 
-**Last Updated**: December 2024  
-**Version**: 1.0  
+**Last Updated**: June 2026
+**Version**: 1.1
 **Maintainer**: DCCI Development Team
