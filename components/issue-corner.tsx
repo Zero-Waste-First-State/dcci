@@ -33,21 +33,26 @@ export default function IssueCorner({ searchParams }: IssueCornerProps) {
 
   // Parse form data from URL on component mount
   useEffect(() => {
-    console.log("Issue Corner mounted, searchParams:", searchParams.toString());
+    //console.log("Issue Corner mounted, searchParams:", searchParams.toString());
+
     const data = parseFormDataFromURL(searchParams);
+
     if (!data) {
       setMessage("Error: Missing form data. Please start over.");
       return;
     }
-    console.log("Parsed form data:", data);
+
+    //console.log("Parsed form data:", data);
+
     setFormData(data);
 
     // Load saved issue data from localStorage
     const savedIssueData = localStorage.getItem(`issue_corner_${data.submissionId}`);
+
     if (savedIssueData) {
       try {
         const loadedData = JSON.parse(savedIssueData);
-        console.log("Loaded saved issue data:", loadedData);
+        //console.log("Loaded saved issue data:", loadedData);
         setIssueData(prev => ({ ...prev, ...loadedData }));
       } catch (error) {
         console.error("Error loading saved issue data:", error);

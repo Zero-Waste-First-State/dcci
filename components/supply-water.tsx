@@ -1,36 +1,34 @@
-"use client";
+'use client';
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { parseFormDataFromURL, type FormData } from "@/lib/utils";
 import { NextButton } from "@/components/ui/dcci/forms/next-button";
 
-interface MixingBinProps {
+interface SupplyWaterProps {
   searchParams: URLSearchParams;
 }
 
 interface TaskData {
-  mixBin1: boolean;
-  mixBin2: boolean;
-  mixBin3: boolean;
-  mixBin4: boolean;
+  waterJugsFill: boolean;
+  waterToBarrel: boolean;
 }
 
-export default function MixingBin({ searchParams }: MixingBinProps) {
+export default function SupplyWater({ searchParams }: SupplyWaterProps) {
   const router = useRouter();
 
-  const localstorageKey = 'mix_bins';
+  const localstorageKey = 'supply_water';
 
   const [formData, setFormData] = useState<FormData | null>(null);
 
   const [taskData, setTaskData] = useState<TaskData>({
-    mixBin1: false,
-    mixBin2: false,
-    mixBin3: false,
-    mixBin4: false,
+    waterJugsFill: false,
+    waterToBarrel: false,
   });
 
   const [message, setMessage] = useState("");
 
+  // Parse form data from URL on component mount
   useEffect(() => {
     const data = parseFormDataFromURL(searchParams);
 
@@ -46,7 +44,7 @@ export default function MixingBin({ searchParams }: MixingBinProps) {
 
     if (isNewInstance) {
       // For new instances, don't load existing data - start fresh
-      console.log("Starting new instance of Mix Bin task");
+      console.log("Starting new instance of Supply Water task");
     } else {
       // Load saved task data from localStorage
       const savedTaskData = localStorage.getItem(`task_${localstorageKey}_${data.submissionId}`);
@@ -62,6 +60,7 @@ export default function MixingBin({ searchParams }: MixingBinProps) {
     }
   }, [searchParams]);
 
+  // Save task data to localStorage only when form is submitted
   const saveTaskData = () => {
     if (!formData) return;
     //console.log("Saving final task data to localStorage:", taskData);
@@ -101,17 +100,20 @@ export default function MixingBin({ searchParams }: MixingBinProps) {
    * @param  {[type]} e: React.FormEvent [description]
    * @return {[type]}    [description]
    */
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (taskData.mixBin === 0) {
-      setMessage("Please select the bin(s) mixed today.");
+    if (!formData) {
+      setMessage("Error: Missing form data. Please start over.");
       return;
     }
 
+    // Save the task data
     saveTaskData();
 
-    router.push(`/compost-form/additional-tasks?${searchParams.toString()}`);
+    // Navigate to additional tasks page
+    const params = new URLSearchParams(searchParams);
+    router.push(`/compost-form/additional-tasks?${params.toString()}`);
   };
 
   const updateTaskData = (field: keyof TaskData) => {
@@ -120,12 +122,8 @@ export default function MixingBin({ searchParams }: MixingBinProps) {
   };
 
   const isFormValid = () => {
-    return taskData.mixBin1
-      || taskData.mixBin2
-      || taskData.mixBin3
-      || taskData.mixBin4
-    ;
-  }
+    return taskData.waterJugsFill || taskData.waterToBarrel;
+  };
 
   if (!formData) {
     return (
@@ -138,35 +136,33 @@ export default function MixingBin({ searchParams }: MixingBinProps) {
   return (
     <form onSubmit={handleSubmit} style={{ width: "100%" }}>
       <h3 className="text-2xl font-bold mb-5 text-earthyGreen">
-        Which bin(s) did you mix today?
+        Select Water Supply Activities:
       </h3>
       <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
         {[
-          { label: "Bin 1", field: "mixBin1" },
-          { label: "Bin 2", field: "mixBin2" },
-          { label: "Bin 3", field: "mixBin3" },
-          { label: "Bin 4", field: "mixBin4" }
-        ].map(b => (
+          { label: "Filled Jugs", field: "waterJugsFill" },
+          { label: "Brought to Barrel", field: "waterToBarrel" }
+        ].map(subtask => (
           <button
-            key={b.field}
+            key={subtask.field}
             type="button"
-            onClick={() => updateTaskData(b.field as keyof TaskData)}
+            onClick={() => updateTaskData(subtask.field as keyof TaskData)}
             style={{
               width: "100%",
               height: "57px",
               borderRadius: "16px",
-              backgroundColor: taskData[b.field as keyof TaskData] ? "#758A48" : "#FFFFFF",
+              backgroundColor: taskData[subtask.field as keyof TaskData] ? "#758A48" : "#FFFFFF",
               border: "1px solid #758A48",
               fontSize: "20px",
               fontWeight: "bold",
               cursor: "pointer",
               display: "flex",
-              color: taskData[b.field as keyof TaskData] ? "#FFFFFF" : "#758A48", // makes text of buttons green instead of default black
+              color: taskData[subtask.field as keyof TaskData] ? "#FFFFFF" : "#758A48", // makes text of buttons green instead of default black
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            {b.label}
+            {subtask.label}
           </button>
         ))}
       </div>
@@ -177,7 +173,7 @@ export default function MixingBin({ searchParams }: MixingBinProps) {
         </p>
       }
 
-      <NextButton isValid={isFormValid()} handler={handleSubmit} />
+     <NextButton isValid={isFormValid()} handler={handleSubmit} />
     </form>
   );
 }

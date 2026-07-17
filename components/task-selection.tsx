@@ -26,14 +26,15 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
       { id: "move_bins", icon: FaCheck, label: "Move Bins", path: "moving-bins" },
       { id: "finished_compost", icon: FaCheck, label: "Taking Finished Compost", path: "finished-compost" },
       { id: "report_issue", icon: FaExclamationCircle, label: "Report Contamination/Issue", path: "litter-page" },
-      { id: "other_tasks", icon: FaCheckDouble, label: "More tasks...", path: "other-tasks"},
+      { id: "other_tasks", icon: FaCheckDouble, label: "More choices...", path: "other-tasks"},
     ],
 
     other: [
       { id: "mix_bins", icon: FaCheck, label: "Mix Bins", path: "mixing-bins"},
-      // { id: "add_water", icon: FaCheck, label: "Add Water to Bin", path: 'adding-water'},
-      // { id: "replenish_water", icon: FaCheck, label: "Fill Water Jugs or Bring Water to Barrel", path: 'replenish-water'},
-      // { id: "sift_compost", icon: FaCheck, label: "Sifting Finished Compost", path: 'sift-compost'},
+      { id: "add_water", icon: FaCheck, label: "Add Water to Bin", path: 'adding-water'},
+      { id: "supply_water", icon: FaCheck, label: "Water - \nFill Jugs/Bring to Barrel", path: 'supply-water'},
+      { id: "sift_compost", icon: FaCheck, label: "Sift Finished Compost", path: 'sifting-compost'},
+      { id: "primary_tasks", icon: FaCheckDouble, label: "Back", path: "primary-tasks"},
     ]
   };
 
@@ -76,11 +77,14 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
   const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleTaskSelected = (task) => {
-    // console.log(`receiving task selection (${task}) from child task-selection component`);
+    console.log(`receiving task selection (${task}) from child task-selection component`);
 
     if (task === 'other_tasks') {
-      //console.log('render other tasks');
-      setTaskSet('other_tasks');
+      setTaskSet('other');
+      setSelectedTask('');
+    }
+    else if (task === 'primary_tasks') {
+      setTaskSet('primary');
       setSelectedTask('');
     }
     else {

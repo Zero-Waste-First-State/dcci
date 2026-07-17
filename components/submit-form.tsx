@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { parseFormDataFromURL, type FormData } from "@/lib/utils";
+import { TaskDataDetail } from "@/components/ui/dcci/forms/task-data-detail";
 import { sendAlertEmails } from "@/lib/email";
-
 import { FaArrowRight } from "react-icons/fa";
 
 interface SubmitFormProps {
@@ -41,11 +41,22 @@ interface TaskData {
   moveBin4SteelBins?: boolean;
   // Finished Compost specific fields
   gallonsTaken?: string;
+  // Adding Water specific fields
+  //binType?: string; // already defined
+  // waterBin1?: boolean;
+  // waterBin2?: boolean;
+  // waterBin3?: boolean;
+  // waterBin4?: boolean;
+  // Supply Water specific fields
+  waterJugsFill?: boolean;
+  waterToBarrel?: boolean;
   // Mixing Bins specific fields
   mixBin1?: boolean;
   mixBin2?: boolean;
   mixBin3?: boolean;
   mixBin4?: boolean;
+  // Sifting Finished compost
+  allSifted?: string;
 }
 
 interface IssueData {
@@ -89,6 +100,11 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
   const [deletingTaskType, setDeletingTaskType] = useState<string>("");
   const [deletingTaskIndex, setDeletingTaskIndex] = useState<number>(-1);
 
+  /**
+   * fetchSiteName // util
+   * @param  {[type]} siteId: number        [description]
+   * @return {[type]}         [description]
+   */
   const fetchSiteName = async (siteId: number) => {
     try {
       const supabase = createClient();
@@ -110,6 +126,12 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
     }
   };
 
+  /**
+   * handleEditTask // form handler
+   * @param  {[type]} taskType:  string        [description]
+   * @param  {Number} taskIndex: number        [description]
+   * @return {[type]}            [description]
+   */
   const handleEditTask = (taskType: string, taskIndex: number = -1) => {
     setEditingTaskType(taskType);
     setEditingTaskIndex(taskIndex);
@@ -178,6 +200,10 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
     handleCloseDeleteModal();
   };
 
+  /**
+   * handleSaveEdit // "save" form handler
+   * @return {[type]} [description]
+   */
   const handleSaveEdit = () => {
     if (!editingTaskType) return;
 
@@ -219,8 +245,12 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
       'measure_bin',
       'move_bins',
       'mix_bins',
-      'finished_compost'
+      'finished_compost',
+      'add_water',
+      'supply_water',
+      'sift_compost',
     ];
+
     const allTaskData: Record<string, TaskData | TaskData[]> = {};
     
     taskTypes.forEach(taskType => {
@@ -230,7 +260,7 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
           const taskData = JSON.parse(savedData);
           
           // For moving or mixing bins, ensure it's always treated as an array for consistent display
-          if (['move_bins', 'mix_bins'].includes(taskType) && !Array.isArray(taskData)) {
+          if (['move_bins', 'mix_bins', 'add_water'].includes(taskType) && !Array.isArray(taskData)) {
             // Convert single moving bins task to array format
             allTaskData[taskType] = [taskData];
           } else {
@@ -303,7 +333,7 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
       const newSubmissionId = submissionData.submission_id;
       setSubmissionId(newSubmissionId);
 
-             // Insert all task-specific data into appropriate tables
+      // Insert all task-specific data into appropriate tables
        console.log("Processing task data:", taskData);
        for (const [taskId, data] of Object.entries(taskData)) {
          if (data) {
@@ -312,11 +342,12 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
            const tasksToProcess = Array.isArray(data) ? data : [data];
            
            for (const taskData of tasksToProcess) {
+             let table = '';
              let insertData: Record<string, unknown> = { submission_id: newSubmissionId };
 
              switch (taskId) {
-               case 'measure_bin':
-                 // Insert into Measurements table
+
+               case 'measure_bin': // Insert into Measurements table
                  insertData = {
                    submission_id: newSubmissionId,
                    bin_type: taskData.binType || 'general',
@@ -383,8 +414,9 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
                   }
                  break;
 
-               case 'move_bins':
-                 // Insert into Moving Day table
+               case 'move_bins': // Insert into Moving Day table
+                 table = 'Moving Day'; // huh?
+
                  insertData = {
                    submission_id: newSubmissionId,
                    move_bin1_bin2: taskData.moveBin1Bin2 || false,
@@ -392,17 +424,22 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
                    move_bin3_bin4: taskData.moveBin3Bin4 || false,
                    move_bin4_steel_bins: taskData.moveBin4SteelBins || false
                  };
-                 console.log("Inserting moving bins data:", insertData);
-                 const { error: moveError } = await supabase.from("Moving Day").insert(insertData);
+
+                 const { error: moveError } = await supabase
+                   .from(table)
+                   .insert(insertData)
+                 ;
+
                  if (moveError) {
                    console.error("Error inserting moving bins data:", moveError);
                    throw new Error(`Failed to insert moving bins data: ${moveError.message}`);
                  }
-                 console.log("Moving bins data inserted successfully");
+
                  break;
 
-               case 'mix_bins':
-                 // Insert into Mixing Bins table
+               case 'mix_bins': // Insert into Mixing Bins table
+                 table = `task_${taskId}`;
+
                  insertData = {
                    submission_id: newSubmissionId,
                    mix_bin1: taskData.mixBin1 || false,
@@ -410,29 +447,113 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
                    mix_bin3: taskData.mixBin3 || false,
                    mix_bin4: taskData.mixBin4 || false,
                  };
-                 console.log("Inserting mixing bins data:", insertData);
-                 const { error: mixError } = await supabase.from("Mixing Bins").insert(insertData);
+
+                 console.log(`Creating task in ${table} using:`, insertData);
+
+                 const { error: mixError } = await supabase
+                   .from(table)
+                   .insert(insertData)
+                 ;
+
                  if (mixError) {
                    console.error("Error inserting mixing bins data:", mixError);
                    throw new Error(`Failed to insert mixing bins data: ${mixError.message}`);
                  }
-                 console.log("Mixing bins data inserted successfully");
+
                  break;
 
-               case 'finished_compost':
-                 // Insert into Finished Compost table
+               case 'finished_compost': // Insert into Finished Compost table
+                 table = 'Finished Compost';
+
                  insertData = {
                    submission_id: newSubmissionId,
                    gallons_compost_taken: taskData.gallonsTaken ? parseFloat(taskData.gallonsTaken) : 0
                  };
-                 console.log("Inserting finished compost data:", insertData);
-                 const { error: compostError } = await supabase.from("Finished Compost").insert(insertData);
+
+                 console.log(`Creating task in ${table} using:`, insertData);
+
+                 const { error: compostError } = await supabase
+                  .from(table)
+                  .insert(insertData)
+                ;
+
                  if (compostError) {
                    console.error("Error inserting finished compost data:", compostError);
                    throw new Error(`Failed to insert finished compost data: ${compostError.message}`);
                  }
-                 console.log("Finished compost data inserted successfully");
+
                  break;
+
+              case 'add_water': // Insert into task_add_water table
+                table = `task_${taskId}`;
+
+                insertData = {
+                  submission_id: newSubmissionId,
+                  bin: taskData.binType,
+                  // water_bin1: taskData.waterBin1 || false,
+                  // water_bin2: taskData.waterBin2 || false,
+                  // water_bin3: taskData.waterBin3 || false,
+                  // water_bin4: taskData.waterBin4 || false,
+                };
+
+                console.log(`Creating task in ${table} using:`, insertData);
+
+                const { error: addWaterError } = await supabase
+                  .from(table)
+                  .insert(insertData)
+                ;
+
+                if (addWaterError) {
+                  console.error("Error inserting watering bin data:", addWaterError);
+                  throw new Error(`Failed to insert watering bin data: ${addWaterError.message}`);
+                }
+
+                break;
+
+              case 'supply_water': // Insert into task_supply_water table
+                table = `task_${taskId}`;
+
+                insertData = {
+                  submission_id: newSubmissionId,
+                  fill_jugs: taskData.waterJugsFill || false,
+                  to_barrel: taskData.waterToBarrel || false,
+                };
+
+                console.log(`Creating task in ${table} using:`, insertData);
+
+                const { error: supplyWaterError } = await supabase
+                  .from(table)
+                  .insert(insertData)
+                ;
+
+                if (supplyWaterError) {
+                  console.error("Error inserting supply water data:", supplyWaterError);
+                  throw new Error(`Failed to insert supply water data: ${supplyWaterError.message}`);
+                }
+
+                break;
+
+              case 'sift_compost': // Insert into task_sift_compost table
+                table = `task_${taskId}`;
+
+                insertData = {
+                  submission_id: newSubmissionId,
+                  all_sifted: taskData.allSifted === 'yes' ? true : false,
+                };
+
+                console.log(`Creating task in ${table} using:`, insertData);
+
+                const { error: siftCompostError } = await supabase
+                  .from(table)
+                  .insert(insertData)
+                ;
+
+                if (siftCompostError) {
+                  console.error("Error inserting supply water data:", siftCompostError);
+                  throw new Error(`Failed to insert supply water data: ${siftCompostError.message}`);
+                }
+
+                break;
             }
           }
         }
@@ -530,21 +651,42 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
     }
   };
 
+  /**
+   * labelFromSnakeCase
+   *
+   * converts a string like 'happy_gilmore' to 'Happy Gilmore'
+   *
+   * @param  {[type]} snakeyString: string        [description]
+   * @return {[type]}               [description]
+   */
+  const labelFromSnakeCase = (snakeyString: string) => {
+    return snakeyString
+      .replace('_', ' ')
+      .replace(/\b\w/g, l => l.toUpperCase())
+    ;
+  }
+
+  /**
+   * formatTaskName // (this is utterly ridiculous)
+   * @param  {[type]} taskId: string        [description]
+   * @return {[type]}         [description]
+   */
   const formatTaskName = (taskId: string) => {
-    switch (taskId) {
-      case 'add_material':
-        return 'Add Material';
-      case 'measure_bin':
-        return 'Measure Bin';
-      case 'move_bins':
-        return 'Move Bins';
-      case 'mix_bin':
-        return 'Mix Bins'
-      case 'finished_compost':
-        return 'Taking Compost';
-      default:
-        return taskId.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
-    }
+    const taskMap = {
+      'add_material'     : 'Added Material',
+      'measure_bin'      : 'Measure Bin',
+      'move_bins'        : 'Move Bins',
+      'mix_bin'          : 'Mix Bins',
+      'finished_compost' : 'Taking Compost',
+      'add_water'        : 'Added Water',
+      'supply_water'     : 'Supply Water',
+      'sift_compost'     : 'Sift Finished Compost',
+    };
+
+    return Object.hasOwn(taskMap, taskId)
+      ? taskMap[taskId]
+      : labelFromSnakeCase(taskId)
+    ;
   };
 
   const formatBinType = (binType: string) => {
@@ -628,7 +770,7 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
             {taskData.mixBin1 && <p><strong>Mixed:</strong> Bin 1</p>}
             {taskData.mixBin2 && <p><strong>Mixed:</strong> Bin 2</p>}
             {taskData.mixBin3 && <p><strong>Mixed:</strong> Bin 3</p>}
-            {taskData.mixBin4 && <p><strong>Mixed:</strong> Bin 3</p>}
+            {taskData.mixBin4 && <p><strong>Mixed:</strong> Bin 4</p>}
           </div>
         );
 
@@ -636,6 +778,33 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
         return (
           <div style={{ fontSize: "14px", color: "#000000", lineHeight: "1.4" }}>
             {taskData.gallonsTaken && <p><strong>Compost Taken:</strong> {taskData.gallonsTaken} gallons</p>}
+          </div>
+        );
+
+      case 'add_water':
+        return (
+          <div style={{ fontSize: "14px", color: "#000000", lineHeight: "1.4" }}>
+            {taskData.binType && <p><strong>Added Water to:</strong> {formatBinType(taskData.binType || '')}</p>}
+            {/*{taskData.waterBin1 && <p><strong>Added water:</strong> Bin 1</p>}
+            {taskData.waterBin2 && <p><strong>Added water:</strong> Bin 2</p>}
+            {taskData.waterBin3 && <p><strong>Added water:</strong> Bin 3</p>}
+            {taskData.waterBin4 && <p><strong>Added water:</strong> Bin 4</p>}*/}
+          </div>
+        );
+
+      case 'supply_water':
+        return (
+          <div style={{ fontSize: "14px", color: "#000000", lineHeight: "1.4" }}>
+            {taskData.waterJugsFill && <p><strong>Filled Water Jugs</strong></p>}
+            {taskData.waterToBarrel && <p><strong>Brought Water to Barrel</strong></p>}
+          </div>
+        );
+
+      case 'sift_compost':
+        return (
+          <div style={{ fontSize: "14px", color: "#000000", lineHeight: "1.4" }}>
+            {(taskData.allSifted === 'yes') && <p><strong>Sifted All Finished Compost</strong></p>}
+            {(taskData.allSifted ==='no') && <p><strong>Sifted Some Finished Compost</strong></p>}
           </div>
         );
 
@@ -749,140 +918,36 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
                         {formatTaskName(taskId)}
                       </p>
                     </div>
-                    {Array.isArray(data) ? (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                        {data.map((task, index) => (
-                          <div
-                            key={index}
-                            style={{
-                              borderLeft: "3px solid #4CAF50",
-                              paddingLeft: "12px",
-                            }}
-                          >
-                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                              <p
-                                style={{
-                                  fontSize: "14px",
-                                  fontWeight: "bold",
-                                  fontFamily: "PT Sans, sans-serif",
-                                  color: "#666666",
-                                  margin: 0,
-                                }}
-                              >
-                                Instance {index + 1}:
-                              </p>
-                              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                                <button
-                                  type="button"
-                                  onClick={() => handleEditTask(taskId, index)}
-                                  style={{
-                                    padding: "8px 16px",
-                                    backgroundColor: "#899D5E",
-                                    color: "white",
-                                    border: "none",
-                                    borderRadius: "8px",
-                                    fontSize: "14px",
-                                    fontWeight: "bold",
-                                    cursor: "pointer",
-                                    fontFamily: "PT Sans, sans-serif",
-                                    minHeight: "40px",
-                                    minWidth: "80px",
-                                  }}
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteTask(taskId, index)}
-                                  style={{
-                                    width: "40px",
-                                    height: "40px",
-                                    backgroundColor: "#FF4444",
-                                    color: "white",
-                                    border: "none",
-                                    borderRadius: "50%",
-                                    fontSize: "20px",
-                                    fontWeight: "bold",
-                                    cursor: "pointer",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    fontFamily: "PT Sans, sans-serif",
-                                  }}
-                                >
-                                  ×
-                                </button>
-                              </div>
-                            </div>
-                            {renderTaskData(taskId, task)}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div
-                        style={{
-                          borderLeft: "3px solid #4CAF50",
-                          paddingLeft: "12px",
-                        }}
-                      >
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                          <p
-                            style={{
-                              fontSize: "14px",
-                              fontWeight: "bold",
-                              fontFamily: "PT Sans, sans-serif",
-                              color: "#666666",
-                              margin: 0,
-                            }}
-                          >
-                            Instance 1:
-                          </p>
-                          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                            <button
-                              type="button"
-                              onClick={() => handleEditTask(taskId)}
-                              style={{
-                                padding: "8px 16px",
-                                backgroundColor: "#899D5E",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "8px",
-                                fontSize: "14px",
-                                fontWeight: "bold",
-                                cursor: "pointer",
-                                fontFamily: "PT Sans, sans-serif",
-                                minHeight: "40px",
-                                minWidth: "80px",
-                              }}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteTask(taskId)}
-                              style={{
-                                width: "40px",
-                                height: "40px",
-                                backgroundColor: "#FF4444",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "50%",
-                                fontSize: "20px",
-                                fontWeight: "bold",
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontFamily: "PT Sans, sans-serif",
-                              }}
-                            >
-                              ×
-                            </button>
-                          </div>
+
+                    {Array.isArray(data)
+                      ?
+                      // taskData is array
+                      (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                          {data.map((task, index) => (
+                            <TaskDataDetail key="index"
+                              index={index}
+                              taskId={taskId}
+                              taskData={task}
+                              renderFn={renderTaskData}
+                              editFn={handleEditTask}
+                              deleteFn={handleDeleteTask}
+                            />
+                          ))}
                         </div>
-                        {renderTaskData(taskId, data)}
-                      </div>
-                    )}
+                      )
+                      :
+                      // taskData is scalar
+                      (
+                        <TaskDataDetail key="index"
+                          taskId={taskId}
+                          taskData={data}
+                          renderFn={renderTaskData}
+                          editFn={handleEditTask}
+                          deleteFn={handleDeleteTask}
+                        />
+                      )
+                    }
                   </div>
                 ))}
               </div>
@@ -2152,6 +2217,48 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
                </div>
              )}
 
+            {editingTaskType === 'add_water' && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div>
+                 <p
+                   style={{
+                     fontSize: "16px",
+                     marginBottom: "10px",
+                     fontFamily: "PT Sans, sans-serif",
+                     color: "#000000",
+                     fontWeight: "bold",
+                   }}
+                 >
+                   Select the bin watered:
+                 </p>
+                 <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                   <select
+                    value={editFormData.binType || ''}
+                    onChange={(e) => setEditFormData({ ...editFormData, binType: e.target.value })}
+                    aria-label="Select bin type"
+                    style={{
+                      width: "100%",
+                      height: "57px",
+                      borderRadius: "16px",
+                      backgroundColor: "#ffffff",
+                      border: "2px solid #758A48",
+                      fontSize: "20px",
+                      padding: "0 12px",
+                      fontFamily: "PT Sans, sans-serif",
+                      color: "#758A48",
+                    }}
+                  >
+                    <option value="">Select a bin</option>
+                    <option value="bin1">Bin 1</option>
+                    <option value="bin2">Bin 2</option>
+                    <option value="bin3">Bin 3</option>
+                    <option value="bin4">Bin 4</option>
+                  </select>
+                  </div>
+                </div>
+              </div>
+            )}
+
              <div style={{ display: "flex", gap: "12px", marginTop: "24px", justifyContent: "flex-end" }}>
                <button
                  type="button"
@@ -2258,7 +2365,7 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
                  lineHeight: "1.4",
                }}
              >
-               Are you sure you want to delete this {formatTaskName(deletingTaskType)} instance? This action cannot be undone.
+               Are you sure you want to delete this <em>{formatTaskName(deletingTaskType)}</em> task? This action cannot be undone.
              </p>
 
              <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>

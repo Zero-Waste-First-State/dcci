@@ -41,7 +41,7 @@ export default function TasksAvailable({ taskSet, onSelect }: TasksAvailableProp
               type="button"
               onClick={() => setSelectedTask(task.id)}
               style={{
-                width: "100%",
+                width: ['other_tasks', 'primary_tasks'].includes(task.id) ? "60%" : "100%",
                 height: "65px",
                 borderRadius: "26px",
                 border: `1px solid ${COLORS.green}`,
@@ -52,11 +52,12 @@ export default function TasksAvailable({ taskSet, onSelect }: TasksAvailableProp
                 fontWeight: "bold",
                 cursor: "pointer",
                 transition: "all 0.2s",
-                textAlign: "left",
+                textAlign: ['other_tasks', 'primary_tasks'].includes(task.id) ? "center" : "left",
                 paddingLeft: "2rem",
+                paddingRight: "2rem",
+                marginLeft: ['other_tasks', 'primary_tasks'].includes(task.id) ? "4rem" : "unset",
               }}
             >
-              <TaskIcon style={{ display: "inline-block", float: "left", marginLeft: "10px" }}/>
 
               &nbsp; {task.label}
             </button>
