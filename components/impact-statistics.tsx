@@ -11,6 +11,10 @@ import { createClient } from "@/lib/supabase/client";
 import { DNREC_2024_FINAL_RESULTS } from "@/lib/constants";
 import { ImpactStatisticsYtd } from "@/components/impact-statistics-ytd";
 
+interface Context {
+  embedded?: boolean;
+}
+
 interface ImpactStats {
   totalSites: number;
   totalParticipants: number;
@@ -39,7 +43,7 @@ const GAS_PER_POUND_FOOD_SCRAPS = 0.1; // Transportation savings (gallons per lb
 // Source: https://www.epa.gov/land-research/quantifying-methane-emissions-landfilled-food-waste
 const TONS_METHANE_PER_TON_FOOD_SCRAPS = 0.042;
 
-export function ImpactStatistics() {
+export function ImpactStatistics({ embedded=false }: Context) {
   const [stats, setStats] = useState<ImpactStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -191,6 +195,13 @@ export function ImpactStatistics() {
     <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6 md:p-8 shadow-lg w-full max-w-4xl mx-auto">
       {/* Section: Total since launch (Jan 1, 2024) – no redundant title block */}
       <div className="mb-6 md:mb-8">
+
+        {embedded &&
+          <h2 className="text-xl md:text-xl font-bold text-green-700 mb-1 md:mb-4 text-center">
+            Impact Statistics
+          </h2>
+        }
+
         <h3 className="text-lg md:text-xl font-bold text-green-700 mb-3 md:mb-4 text-center">
           Since Launch (January 1, 2024)
         </h3>
@@ -260,26 +271,28 @@ export function ImpactStatistics() {
       {FEATURE_FLAG_IMPACT_YTD && <ImpactStatisticsYtd />}
 
       {/* Methodology disclaimer – slightly larger font for readability */}
-      <div className="mt-6 md:mt-8 bg-blue-50 border border-blue-200 rounded-xl p-4 md:p-6">
-        <h4 className="text-sm md:text-base font-semibold text-blue-800 mb-2">Methodology & Estimates</h4>
-        <div className="text-sm md:text-base text-blue-700 space-y-2">
-          <ol className="list-decimal ml-4">
-            <li id="footnote1-scraps">
-              <strong>Food Scraps Diverted:</strong> EPA-aligned estimate (98% of greens as food scraps, 100% diverted from landfill).
-            </li>
-            <li id="footnote2-methane">
-              <strong>Methane Reduced:</strong> Based on EPA methodology for avoided landfilled food waste. See{" "}
-              <a href="https://www.epa.gov/land-research/quantifying-methane-emissions-landfilled-food-waste" target="_blank" rel="noreferrer noopener" className="underline">EPA Quantifying Methane Emissions from Landfilled Food Waste</a>.
-            </li>
-            <li id="footnote3-co2gas">
-              <strong>CO<sub>2</sub> & Gas:</strong> EPA estimate for CO<sub>2</sub>; transportation savings for fuel conserved. Approximations for educational purposes.
-            </li>
-          </ol>
-          <p>
-            <strong>Data:</strong> All statistics from actual form submissions in the DCCI database.
-          </p>
+      {!embedded &&
+        <div className="mt-6 md:mt-8 bg-blue-50 border border-blue-200 rounded-xl p-4 md:p-6">
+          <h4 className="text-sm md:text-base font-semibold text-blue-800 mb-2">Methodology & Estimates</h4>
+          <div className="text-sm md:text-base text-blue-700 space-y-2">
+            <ol className="list-decimal ml-4">
+              <li id="footnote1-scraps">
+                <strong>Food Scraps Diverted:</strong> EPA-aligned estimate (98% of greens as food scraps, 100% diverted from landfill).
+              </li>
+              <li id="footnote2-methane">
+                <strong>Methane Reduced:</strong> Based on EPA methodology for avoided landfilled food waste. See{" "}
+                <a href="https://www.epa.gov/land-research/quantifying-methane-emissions-landfilled-food-waste" target="_blank" rel="noreferrer noopener" className="underline">EPA Quantifying Methane Emissions from Landfilled Food Waste</a>.
+              </li>
+              <li id="footnote3-co2gas">
+                <strong>CO<sub>2</sub> & Gas:</strong> EPA estimate for CO<sub>2</sub>; transportation savings for fuel conserved. Approximations for educational purposes.
+              </li>
+            </ol>
+            <p>
+              <strong>Data:</strong> All statistics from actual form submissions in the DCCI database.
+            </p>
+          </div>
         </div>
-      </div>
+      }
     </div>
   );
 }
