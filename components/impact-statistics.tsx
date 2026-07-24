@@ -11,6 +11,10 @@ import { createClient } from "@/lib/supabase/client";
 import { DNREC_2024_FINAL_RESULTS } from "@/lib/constants";
 import { ImpactStatisticsYtd } from "@/components/impact-statistics-ytd";
 
+interface Context {
+  embedded?: boolean;
+}
+
 interface ImpactStats {
   totalSites: number;
   totalParticipants: number;
@@ -39,10 +43,12 @@ const GAS_PER_POUND_FOOD_SCRAPS = 0.1; // Transportation savings (gallons per lb
 // Source: https://www.epa.gov/land-research/quantifying-methane-emissions-landfilled-food-waste
 const TONS_METHANE_PER_TON_FOOD_SCRAPS = 0.042;
 
-export function ImpactStatistics() {
+export function ImpactStatistics({ embedded=false }: Context) {
   const [stats, setStats] = useState<ImpactStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  console.log(embedded);
 
   useEffect(() => {
     fetchImpactStats();
@@ -191,6 +197,13 @@ export function ImpactStatistics() {
     <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6 md:p-8 shadow-lg w-full max-w-4xl mx-auto">
       {/* Section: Total since launch (Jan 1, 2024) – no redundant title block */}
       <div className="mb-6 md:mb-8">
+
+        {embedded &&
+          <h2 className="text-xl md:text-xl font-bold text-green-700 mb-1 md:mb-4 text-center">
+            Impact Statistics
+          </h2>
+        }
+
         <h3 className="text-lg md:text-xl font-bold text-green-700 mb-3 md:mb-4 text-center">
           Since Launch (January 1, 2024)
         </h3>
