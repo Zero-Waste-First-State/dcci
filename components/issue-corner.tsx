@@ -148,7 +148,7 @@ export default function IssueCorner({ searchParams }: IssueCornerProps) {
                 color: "#856404",
               }}
             >
-              Elisa King
+              DCCI Site Management
             </p>
             <p
               style={{
@@ -157,7 +157,7 @@ export default function IssueCorner({ searchParams }: IssueCornerProps) {
                 color: "#856404",
               }}
             >
-              Email: DCCI@PlasticFreeDelaware.org
+              Email: <a href="mailto:DCCI@PlasticFreeDelaware.org">DCCI@PlasticFreeDelaware.org</a>
             </p>
           </div>
 

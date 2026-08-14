@@ -211,7 +211,9 @@ export function ImpactStatistics({ embedded=false }: Context) {
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {stats.totalSites} {stats.totalSites > 1 ? 'Sites' : 'Site'}
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">Launch</div>
+              <div className="text-base md:text-lg font-medium text-gray-700">
+                {stats.totalSites > 1 ? 'Launched' : 'Launch'}
+              </div>
             </div>
           </div>
           <div className="bg-white rounded-xl p-3 md:p-5 shadow-md border border-green-100">
@@ -244,7 +246,7 @@ export function ImpactStatistics({ embedded=false }: Context) {
               <div className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600 mb-1">
                 {formatNumber(stats.co2Saved, 0)} Lbs. CO<sub>2</sub>
               </div>
-              <div className="text-base md:text-lg font-medium text-gray-700">Saved <sup><small><a href="#footnote3-co2gas">[3]</a></small></sup></div>
+              <div className="text-base md:text-lg font-medium text-gray-700">Production reduced <sup><small><a href="#footnote3-co2gas">[3]</a></small></sup></div>
               {/*<div className="text-xs md:text-sm text-gray-500 mt-0.5">EPA Estimate *</div>*/}
             </div>
           </div>
