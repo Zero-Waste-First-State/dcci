@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
@@ -15,7 +15,7 @@ function TaskSelectionContent() {
   const cardStyles = {
     width: "428px",
     margin: "0 auto",
-    padding: "24px",
+    padding: "12px",
     fontFamily: "PT Sans, sans-serif",
   };
 
@@ -63,7 +63,7 @@ function TaskSelectionContent() {
       <BackButton />
       <FormHeading subHeading="Task Selection" />
 
-      <div style={{ marginTop: "150px", width: "100%"}}>
+      <div style={{ marginTop: "130px", width: "100%"}}>
         <TaskSelection siteId={Number(siteId)} />
       </div>
     </motion.main>

@@ -1,9 +1,7 @@
-"use client";
+'use client';
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-// import { FaCheck } from "react-icons/fa";
-// import { FaCheckDouble } from "react-icons/fa";
-import { FaExclamationCircle } from "react-icons/fa";
 
 interface TasksAvailableProps {
   taskSet: string;
@@ -11,6 +9,11 @@ interface TasksAvailableProps {
 
 export default function TasksAvailable({ taskSet, onSelect }: TasksAvailableProps) {
   const [selectedTask, setSelectedTask] = useState<string>("");
+
+  /**
+   * @Todo:
+   *   add support for de-selecting (clearing) selected task
+   */
 
   useEffect(() => {
     if (selectedTask) {

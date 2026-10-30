@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { FaArrowRight, FaCheck, FaCheckDouble, FaExclamationCircle } from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa";
 import TasksAvailable from "@/components/tasks-available";
+import { tasks } from '@/lib/tasks';
 
 interface TaskSelectionProps {
   siteId: number;
@@ -18,29 +19,9 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
   const [message, setMessage] = useState("");
   const router = useRouter();
 
-  const tasksAvailable = {
-    primary: [
-      { id: "add_material", icon: FaCheck, label: "Add Material to Bin", path: "adding-material" },
-      // { id: "dropoff_grounds", label: "Drop Off Coffee Grounds", path: 'dropoff-grounds'}, // roll into "add material" task
-      { id: "measure_bin", icon: FaCheck, label: "Measure Bin", path: "measuring-bin" },
-      { id: "move_bins", icon: FaCheck, label: "Move Bins", path: "moving-bins" },
-      { id: "finished_compost", icon: FaCheck, label: "Taking Finished Compost", path: "finished-compost" },
-      { id: "report_issue", icon: FaExclamationCircle, label: "Report Contamination/Issue", path: "litter-page" },
-      { id: "other_tasks", icon: FaCheckDouble, label: "More choices...", path: "other-tasks"},
-    ],
-
-    other: [
-      { id: "mix_bins", icon: FaCheck, label: "Mix Bins", path: "mixing-bins"},
-      { id: "add_water", icon: FaCheck, label: "Add Water to Bin", path: 'adding-water'},
-      { id: "supply_water", icon: FaCheck, label: "Water - \nFill Jugs/Bring to Barrel", path: 'supply-water'},
-      { id: "sift_compost", icon: FaCheck, label: "Sift Finished Compost", path: 'sifting-compost'},
-      { id: "primary_tasks", icon: FaCheckDouble, label: "Back", path: "primary-tasks"},
-    ]
-  };
-
   const activeTaskSet = taskSet === 'primary'
-    ? tasksAvailable.primary
-    : tasksAvailable.other
+    ? tasks.primary
+    : tasks.other
   ;
 
   // Load saved data
@@ -77,8 +58,6 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
   const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleTaskSelected = (task) => {
-    console.log(`receiving task selection (${task}) from child task-selection component`);
-
     if (task === 'other_tasks') {
       setTaskSet('other');
       setSelectedTask('');
@@ -145,16 +124,16 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
   };
 
   return (
-    <div style={{ width: "100%" }}>
+    <div className="compost-log-form">
       {/* Title */}
-      <p style={{ fontSize: "32px", fontWeight: "bold", color: COLORS.green, marginBottom: "20px", textAlign: "center", fontFamily: "PT Sans, sans-serif" }}>
+      <h2 style={{ marginBottom: "20px" }}>
         What are you doing today?
-      </p>
-      <p style={{ fontSize: "24px", color: COLORS.grayText, marginBottom: "30px", textAlign: "center", fontFamily: "PT Sans, sans-serif" }}>
-        (Please fill out the form below)
+      </h2>
+      <p style={{ marginBottom: "30px" }}>
+        Please fill out the form below
       </p>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
+      <form onSubmit={handleSubmit}>
         {/* First Name */}
         <div style={{ marginBottom: "20px" }}>
           <label htmlFor="firstName" style={{ fontFamily: "PT Sans, sans-serif", fontSize: "24px", color: COLORS.green }}>
@@ -233,9 +212,9 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
 
         {/* Task Buttons */}
         <div style={{ marginBottom: "30px" }}>
-          <p style={{ fontSize: "24px", fontWeight: "bold", color: COLORS.green, marginBottom: "15px", textAlign: "center", fontFamily: "PT Sans, sans-serif" }}>
+          <h3 style={{  marginBottom: "15px" }}>
             Select a Task:
-          </p>
+          </h3>
 
           <TasksAvailable
             taskSet={activeTaskSet}

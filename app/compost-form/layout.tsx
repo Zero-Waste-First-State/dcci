@@ -1,7 +1,10 @@
 'use client';
 
+// app/compost-form/layout.tsx
+
 import { Inter } from 'next/font/google';
 import { AnimatePresence, motion } from 'framer-motion';
+import './compost-form.css';
 
 const inter = Inter({ subsets: ['latin'] });
 

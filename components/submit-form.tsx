@@ -6,6 +6,7 @@ import { parseFormDataFromURL, type FormData } from "@/lib/utils";
 import { TaskDataDetail } from "@/components/ui/dcci/forms/task-data-detail";
 import { sendAlertEmails } from "@/lib/email";
 import { FaArrowRight } from "react-icons/fa";
+import { taskTypes } from "@/lib/tasks";
 
 interface SubmitFormProps {
   searchParams: URLSearchParams;
@@ -230,27 +231,18 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
 
   useEffect(() => {
     const data = parseFormDataFromURL(searchParams);
+
     if (!data) {
       setMessage("Error: Missing form data. Please start over.");
       return;
     }
+
     setFormData(data);
 
     // Fetch site name
     fetchSiteName(data.site).then(name => setSiteName(name));
 
     // Load all task data from localStorage for this submission
-    const taskTypes = [
-      'add_material',
-      'measure_bin',
-      'move_bins',
-      'mix_bins',
-      'finished_compost',
-      'add_water',
-      'supply_water',
-      'sift_compost',
-    ];
-
     const allTaskData: Record<string, TaskData | TaskData[]> = {};
     
     taskTypes.forEach(taskType => {
@@ -276,6 +268,7 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
 
     // Load issue data from localStorage
     const savedIssueData = localStorage.getItem(`issue_corner_${data.submissionId}`);
+
     if (savedIssueData) {
       try {
         const issueData = JSON.parse(savedIssueData);
@@ -287,6 +280,7 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
 
     // Load litter data from localStorage
     const savedLitterData = localStorage.getItem(`litter_${data.submissionId}`);
+
     if (savedLitterData) {
       try {
         const litterData = JSON.parse(savedLitterData);
@@ -559,7 +553,7 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
         }
       }
 
-             // Insert issue data if any issues were reported
+      // Insert issue data if any issues were reported
        if (Object.values(issueData).some(value => value === true || (typeof value === 'string' && value.trim()))) {
          const issueInsertData = {
            submission_id: newSubmissionId,
@@ -578,7 +572,7 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
          console.log("Issue data inserted successfully");
        }
 
-             // Insert litter data only if contamination was found
+      // Insert litter data only if contamination was found
        if (litterData.contamination === true) {
          // Insert into the Litter table (not Issues table)
          const litterInsertData = {
@@ -629,19 +623,14 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
       }
 
       setMessage("Submission completed successfully!");
-      
-      // Clear localStorage data for this submission
-      const taskTypes = ['add_material', 'measure_bin', 'move_bins', 'finished_compost'];
-      taskTypes.forEach(taskType => {
-        localStorage.removeItem(`task_${taskType}_${formData.submissionId}`);
-      });
-      localStorage.removeItem(`issue_corner_${formData.submissionId}`);
-      localStorage.removeItem(`litter_${formData.submissionId}`);
 
-             // Add a small delay to show the success state before navigating
-       setTimeout(() => {
-         router.push("/compost-form/thank-you");
-       }, 1500);
+      // Clear localStorage data for this submission
+      drainLocalStorageCache();
+
+      // Add a small delay to show the success state before navigating
+      setTimeout(() => {
+       router.push("/compost-form/thank-you");
+      }, 1500);
 
     } catch (error) {
       console.error("Error during submission:", error);
@@ -667,6 +656,36 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
   }
 
   /**
+   * drainLocalStorageCache
+   *
+   * Clear / cleanup localStorage data (tasks, issue, litter) for this submission
+   *
+   * @return {[type]} [description]
+   */
+  const drainLocalStorageCache = () => {
+    taskTypes.forEach(taskType => {
+      localStorage.removeItem(`task_${taskType}_${formData.submissionId}`);
+    });
+
+    localStorage.removeItem(`issue_corner_${formData.submissionId}`);
+    localStorage.removeItem(`litter_${formData.submissionId}`);
+
+    // 'compost_form_*' will remain, to cache fname, lname, email
+    // but should purge selectedTask from this now-saved entry
+    const formCacheEntry = `compost_form_${formData.site}`;
+
+    const cachedFormData = JSON.parse(
+      localStorage.getItem(formCacheEntry)
+    );
+
+    cachedFormData.selectedTask = '';
+    delete cachedFormData.timestamp;
+
+    // re-save to localstorage
+    localStorage.setItem(formCacheEntry, JSON.stringify(cachedFormData));
+  }
+
+  /**
    * formatTaskName // (this is utterly ridiculous)
    * @param  {[type]} taskId: string        [description]
    * @return {[type]}         [description]
@@ -677,7 +696,7 @@ export default function SubmitForm({ searchParams }: SubmitFormProps) {
       'measure_bin'      : 'Measure Bin',
       'move_bins'        : 'Move Bins',
       'mix_bin'          : 'Mix Bins',
-      'finished_compost' : 'Taking Compost',
+      'finished_compost' : 'Take Finished Compost',
       'add_water'        : 'Added Water',
       'supply_water'     : 'Supply Water',
       'sift_compost'     : 'Sift Finished Compost',
