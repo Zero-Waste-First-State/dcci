@@ -36,4 +36,4 @@ jobs:
         run: supabase link --project-ref ${{ vars.PRODUCTION_PROJECT_ID }}
 
       - name: Migrate Supabase DB changes
-        run: supabase db push --linked
+        run: supabase db push --remote --yes
