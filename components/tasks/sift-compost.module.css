@@ -1,0 +1,56 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  /*padding: 16px;*/
+}
+
+.buttonLabel {
+  position: relative;
+  cursor: pointer;
+}
+
+/* Hide the native radio input visually but keep it accessible */
+.hiddenRadio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Base button styling */
+.buttonVisual {
+  width: 100%;
+  height: 57px;
+  border-radius: 16px;
+  background-color: #FFFFFF;
+  border: 1px solid #758A48;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  color: #758A48;
+  align-items: center;
+  justify-content: center;
+
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+/* Active/Checked state styles */
+.hiddenRadio:checked + .buttonVisual {
+  background-color: #758A48;
+  color: #FFFFFF;
+}
+
+
+/* Focus ring for keyboard tab navigation */
+.hiddenRadio:focus-visible + .buttonVisual {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}

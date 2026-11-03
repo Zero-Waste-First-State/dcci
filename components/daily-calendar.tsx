@@ -69,6 +69,7 @@ export function DailyCalendar() {
           Measurements(bin_type),
           "Adding Material"(greens_pounds, browns_gallons),
           "Moving Day"(moving_id),
+          "Mixing Bins"(mixing_id),
           "Finished Compost"(gallons_compost_taken),
           "Browns Bin"(browns_id),
           Issues(issue_id),
@@ -200,6 +201,7 @@ export function DailyCalendar() {
           Measurements(bin_type),
           "Adding Material"(greens_pounds),
           "Moving Day"(moving_id),
+          "Mixing Bins"(mixing_id),
           "Finished Compost"(gallons_compost_taken),
           "Browns Bin"(browns_id),
           Issues(issue_id),
@@ -223,6 +225,7 @@ export function DailyCalendar() {
         if (submission.Measurements && submission.Measurements.length > 0) tasks.push('Measurements');
         if (submission["Adding Material"] && submission["Adding Material"].length > 0) tasks.push('Adding Material');
         if (submission["Moving Day"] && submission["Moving Day"].length > 0) tasks.push('Moving Bins');
+        if (submission["Mixing Bins"] && submission["Mixing Bins"].length > 0) tasks.push('Mixing Bins');
         if (submission["Finished Compost"] && submission["Finished Compost"].length > 0) tasks.push('Finished Compost');
         if (submission["Browns Bin"] && submission["Browns Bin"].length > 0) tasks.push('Browns Bin');
         if (submission.Issues && submission.Issues.length > 0) tasks.push('Issues');

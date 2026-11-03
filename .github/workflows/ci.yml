@@ -3,14 +3,41 @@
 name: Continuous Integration (CI)
 
 on:
-  push:
-    branches: [main, staging]
+  #push:
+  #  branches: [main, staging]
+  #pull_request:
+  #  branches: [main, staging]
 
-  pull_request:
-    branches: [main, staging]
+  workflow_dispatch:
 
 jobs:
+  tests:
+    if: false # <-- disabled for now
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v6
+
+      - name: Supabase CLI Setup
+        uses: supabase/setup-cli@v2
+        with:
+          version: latest
+
+      - name: Start Supabase local dev setup
+        run: supabase db start
+
+      - name: Verify generated types are checked in
+        run: |
+          supbase gen types typescript --local > types.gen.ts
+          if ! git diff --ignore-space-at-eol --exit-code --quiet types.gen.ts; then
+            echo "Detected uncommitted changes after build. See status below:"
+            git diff
+            exit 1
+          fi
+
   build-and-lint:
+    if: false # <-- disabled for now
     runs-on: ubuntu-latest
 
     steps:

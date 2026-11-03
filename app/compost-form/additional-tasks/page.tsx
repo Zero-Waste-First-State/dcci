@@ -1,17 +1,16 @@
-"use client";
+'use client';
+
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { FaArrowLeft } from "react-icons/fa";
 import { Suspense } from "react";
+
+import BackButton from "@/components/ui/dcci/forms/back-button";
+import FormHeading from "@/components/ui/dcci/forms/form-heading";
 import AdditionalTasks from "@/components/additional-tasks";
-export const dynamic = 'force-dynamic';
+//export const dynamic = 'force-dynamic';
 
 function AdditionalTasksContent() {
   const searchParams = useSearchParams();
-
-  const handleBack = () => {
-    window.history.back();
-  };
 
   return (
     <motion.main
@@ -27,75 +26,14 @@ function AdditionalTasksContent() {
         backgroundColor: "#E1CAB2ff", // earthyTan
         border: "4px solid #76583F", // earthyBrown
         borderRadius: "21px",
-        padding: "24px",
+        padding: "12px",
         fontFamily: "PT Sans, sans-serif",
       }}
     >
-      <button
-        onClick={handleBack}
-        aria-label="Go back"
-        style={{
-          position: "absolute",
-          top: "35px",
-          left: "16px",
-          width: "78px",
-          height: "78px",
-          borderRadius: "50%",
-          backgroundColor: "#2B7180", // blue button
-          opacity: 0.84,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          border: "none",
-        }}
-      >
-        <FaArrowLeft
-          style={{
-            transform: "rotate(0deg)",
-            stroke: "#FFFFFF",
-            strokeWidth: "6px",
-            fontSize: "49px",
-            color: "#FFFFFF",
-          }}
-        />
-      </button>
+      <BackButton />
+      <FormHeading subHeading="Additional Task" />
 
-      <h1
-        style={{
-          position: "absolute",
-          top: "25px",
-          left: "117px",
-          fontSize: "48px",
-          fontFamily: "Lalezar, sans-serif",
-          color: "#76583F", // earthyBrown
-        }}
-      >
-        Compost Log:
-      </h1>
-
-      <h2
-        style={{
-          position: "absolute",
-          top: "72px",
-          left: "117px",
-          fontSize: "36px",
-          fontFamily: "Lalezar, sans-serif",
-          color: "#758A48", // earthyGreen
-        }}
-      >
-        Additional Tasks
-      </h2>
-
-      <div
-        style={{
-          position: "absolute",
-          top: "151px",
-          left: "0px",
-          right: "0px",
-          width: "396px",
-          margin: "0 auto", // center horizontally
-        }}
-      >
+      <div style={{ marginTop: "130px", width: "100%" }}>
         <AdditionalTasks searchParams={searchParams} />
       </div>
     </motion.main>

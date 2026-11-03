@@ -1,7 +1,10 @@
-"use client";
+'use client';
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaArrowRight } from "react-icons/fa";
+import TasksAvailable from "@/components/tasks-available";
+import { tasks } from '@/lib/tasks';
 
 interface TaskSelectionProps {
   siteId: number;
@@ -11,9 +14,15 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [taskSet, setTaskSet] = useState<string>("primary");
   const [selectedTask, setSelectedTask] = useState<string>("");
   const [message, setMessage] = useState("");
   const router = useRouter();
+
+  const activeTaskSet = taskSet === 'primary'
+    ? tasks.primary
+    : tasks.other
+  ;
 
   // Load saved data
   useEffect(() => {
@@ -48,13 +57,19 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
 
   const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const taskOptions = [
-    { id: "add_material", label: "Add Material to Bin", path: "adding-material" },
-    { id: "measure_bin", label: "Measure Bin", path: "measuring-bin" },
-    { id: "move_bins", label: "Move Bins", path: "moving-bins" },
-    { id: "finished_compost", label: "Finished Compost", path: "finished-compost" },
-    { id: "report_issue", label: "Report Contamination/Issue", path: "litter-page" },
-  ];
+  const handleTaskSelected = (task) => {
+    if (task === 'other_tasks') {
+      setTaskSet('other');
+      setSelectedTask('');
+    }
+    else if (task === 'primary_tasks') {
+      setTaskSet('primary');
+      setSelectedTask('');
+    }
+    else {
+      setSelectedTask(task);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +88,8 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
       submissionId: `temp_${Date.now()}`
     });
 
-    const task = taskOptions.find(task => task.id === selectedTask);
+    const task = activeTaskSet.find(task => task.id === selectedTask);
+
     if (task) {
       // Special case: Report Contamination/Issue skips directly to litter page
       if (selectedTask === "report_issue") {
@@ -93,7 +109,10 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
     setMessage("Form data cleared. You can start a new submission.");
   };
 
-  const isFormValid = firstName.trim() && lastName.trim() && email.trim() && selectedTask && isValidEmail(email.trim());
+  const isFormValid = firstName.trim() && lastName.trim()
+    && email.trim() && isValidEmail(email.trim())
+    && selectedTask
+  ;
 
   const COLORS = {
     green: "#758A48",
@@ -105,16 +124,16 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
   };
 
   return (
-    <div style={{ width: "100%" }}>
+    <div className="compost-log-form">
       {/* Title */}
-      <p style={{ fontSize: "32px", fontWeight: "bold", color: COLORS.green, marginBottom: "20px", textAlign: "center", fontFamily: "PT Sans, sans-serif" }}>
+      <h2 style={{ marginBottom: "20px" }}>
         What are you doing today?
-      </p>
-      <p style={{ fontSize: "24px", color: COLORS.grayText, marginBottom: "30px", textAlign: "center", fontFamily: "PT Sans, sans-serif" }}>
-        (Please fill out the form below)
+      </h2>
+      <p style={{ marginBottom: "30px" }}>
+        Please fill out the form below
       </p>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
+      <form onSubmit={handleSubmit}>
         {/* First Name */}
         <div style={{ marginBottom: "20px" }}>
           <label htmlFor="firstName" style={{ fontFamily: "PT Sans, sans-serif", fontSize: "24px", color: COLORS.green }}>
@@ -193,36 +212,15 @@ export default function TaskSelection({ siteId }: TaskSelectionProps) {
 
         {/* Task Buttons */}
         <div style={{ marginBottom: "30px" }}>
-          <p style={{ fontSize: "24px", fontWeight: "bold", color: COLORS.green, marginBottom: "15px", textAlign: "center", fontFamily: "PT Sans, sans-serif" }}>
-            Select a Task to Perform:
-          </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-            {taskOptions.map(task => {
-              const isSelected = selectedTask === task.id;
-              return (
-                <button
-                  key={task.id}
-                  type="button"
-                  onClick={() => setSelectedTask(task.id)}
-                  style={{
-                    width: "100%",
-                    height: "65px",
-                    borderRadius: "26px",
-                    border: `1px solid ${COLORS.green}`,
-                    backgroundColor: isSelected ? COLORS.green : COLORS.white,
-                    color: isSelected ? COLORS.white : COLORS.green,
-                    fontFamily: "PT Sans, sans-serif",
-                    fontSize: "20px",
-                    fontWeight: "bold",
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  {task.label}
-                </button>
-              );
-            })}
-          </div>
+          <h3 style={{  marginBottom: "15px" }}>
+            Select a Task:
+          </h3>
+
+          <TasksAvailable
+            taskSet={activeTaskSet}
+            onSelect={handleTaskSelected}
+          />
+
         </div>
 
         {message && (

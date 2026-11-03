@@ -1,0 +1,71 @@
+'use client';
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+interface TasksAvailableProps {
+  taskSet: string;
+}
+
+export default function TasksAvailable({ taskSet, onSelect }: TasksAvailableProps) {
+  const [selectedTask, setSelectedTask] = useState<string>("");
+
+  /**
+   * @Todo:
+   *   add support for de-selecting (clearing) selected task
+   */
+
+  useEffect(() => {
+    if (selectedTask) {
+      setSelectedTask(selectedTask);
+      onSelect(selectedTask);
+    }
+  }, [selectedTask]);
+
+  const COLORS = {
+    green: "#758A48",
+    greenHover: "#5D7336",
+    grayText: "#8F8F8F",
+    white: "#FFFFFF",
+    inputBg: "#EEEEEE",
+    inputBorder: "#ACACAC",
+  };
+
+  return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "15px", marginBottom: "16px" }}>
+        {taskSet.map(task => {
+
+          const isSelected = selectedTask === task.id;
+          const TaskIcon = task.icon;
+
+          return (
+            <button
+              key={task.id}
+              type="button"
+              onClick={() => setSelectedTask(task.id)}
+              style={{
+                width: ['other_tasks', 'primary_tasks'].includes(task.id) ? "60%" : "100%",
+                height: "65px",
+                borderRadius: "26px",
+                border: `1px solid ${COLORS.green}`,
+                backgroundColor: isSelected ? COLORS.green : COLORS.white,
+                color: isSelected ? COLORS.white : COLORS.green,
+                fontFamily: "PT Sans, sans-serif",
+                fontSize: "20px",
+                fontWeight: "bold",
+                cursor: "pointer",
+                transition: "all 0.2s",
+                textAlign: ['other_tasks', 'primary_tasks'].includes(task.id) ? "center" : "left",
+                paddingLeft: "2rem",
+                paddingRight: "2rem",
+                marginLeft: ['other_tasks', 'primary_tasks'].includes(task.id) ? "4rem" : "unset",
+              }}
+            >
+
+              &nbsp; {task.label}
+            </button>
+          );
+        })}
+      </div>
+  );
+}

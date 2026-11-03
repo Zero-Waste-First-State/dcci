@@ -1,0 +1,36 @@
+name: Deploy Migrations to Production
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'supabase/migrations/**'
+
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment: Production – dcci
+
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.PRODUCTION_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ vars.PRODUCTION_PROJECT_ID }}
+
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v6
+
+      - name: Supabase CLI Setup
+        uses: supabase/setup-cli@v2
+        with:
+          version: latest
+
+      - name: Supabase DB Migrate
+        run: supabase db deploy --project-ref ${{ vars.PRODUCTION_PROJECT_ID }}

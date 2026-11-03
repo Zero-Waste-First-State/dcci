@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { parseFormDataFromURL, type FormData } from "@/lib/utils";
@@ -33,13 +34,14 @@ export default function IssueCorner({ searchParams }: IssueCornerProps) {
 
   // Parse form data from URL on component mount
   useEffect(() => {
-    console.log("Issue Corner mounted, searchParams:", searchParams.toString());
+    //console.log("Issue Corner mounted, searchParams:", searchParams.toString());
     const data = parseFormDataFromURL(searchParams);
     if (!data) {
       setMessage("Error: Missing form data. Please start over.");
       return;
     }
-    console.log("Parsed form data:", data);
+
+    //console.log("Parsed form data:", data);
     setFormData(data);
 
     // Load saved issue data from localStorage
@@ -47,7 +49,7 @@ export default function IssueCorner({ searchParams }: IssueCornerProps) {
     if (savedIssueData) {
       try {
         const loadedData = JSON.parse(savedIssueData);
-        console.log("Loaded saved issue data:", loadedData);
+        //console.log("Loaded saved issue data:", loadedData);
         setIssueData(prev => ({ ...prev, ...loadedData }));
       } catch (error) {
         console.error("Error loading saved issue data:", error);
@@ -58,14 +60,14 @@ export default function IssueCorner({ searchParams }: IssueCornerProps) {
   // Save issue data to localStorage whenever it changes
   useEffect(() => {
     if (formData) {
-      console.log("Saving issue data to localStorage:", issueData);
+      //console.log("Saving issue data to localStorage:", issueData);
       localStorage.setItem(`issue_corner_${formData.submissionId}`, JSON.stringify(issueData));
     }
   }, [issueData, formData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData) {
       setMessage("Error: Missing form data. Please start over.");
       return;
@@ -108,7 +110,7 @@ export default function IssueCorner({ searchParams }: IssueCornerProps) {
     <div style={{ width: "100%" }}>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "30px" }}>
-          
+
           <div
             style={{
               marginBottom: "20px",
@@ -300,27 +302,26 @@ export default function IssueCorner({ searchParams }: IssueCornerProps) {
                 Other
               </button>
 
-              {issueData.other && (
-                <div style={{ marginTop: "10px" }}>
-                  <textarea
-                    value={issueData.otherComment}
-                    onChange={(e) => updateIssueData('otherComment', e.target.value)}
-                    placeholder="Please describe the issue..."
-                    style={{
-                      width: "100%",
-                      height: "80px",
-                      borderRadius: "16px",
-                      backgroundColor: "#EEEEEE",
-                      border: "1px solid #ACACAC",
-                      fontSize: "16px",
-                      padding: "12px",
-                      fontFamily: "PT Sans, sans-serif",
-                      color: "#8F8F8F",
-                      resize: "none",
-                    }}
-                  />
-                </div>
-              )}
+              <div style={{ marginTop: "10px" }}>
+                <textarea
+                  value={issueData.otherComment}
+                  onChange={(e) => updateIssueData('otherComment', e.target.value)}
+                  placeholder="Optional: enter any notes or description of observed issue(s)..."
+                  style={{
+                    width: "100%",
+                    height: "120px",
+                    borderRadius: "16px",
+                    backgroundColor: "#EEEEEE",
+                    border: "1px solid #ACACAC",
+                    fontSize: "16px",
+                    padding: "12px",
+                    fontFamily: "PT Sans, sans-serif",
+                    color: "#8F8F8F",
+                    resize: "none",
+                  }}
+                />
+              </div>
+
             </div>
           </div>
         </div>
