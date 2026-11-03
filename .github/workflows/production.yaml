@@ -1,4 +1,4 @@
-name: Deploy Migrations to Production
+name: Supabase Migrations - Production
 
 on:
   push:
@@ -24,14 +24,16 @@ jobs:
       SUPABASE_PROJECT_ID: ${{ vars.PRODUCTION_PROJECT_ID }}
 
     steps:
-      - name: Code Checkout
+      - name: Checkout Code
         uses: actions/checkout@v6
 
-      - name: Supabase CLI Setup
+      - name: Setup Supabase CLI
         uses: supabase/setup-cli@v2
         with:
           version: latest
 
-      - name: Supabase DB Migrate
+      - name: Link Supabase Project
         run: supabase link --project-ref ${{ vars.PRODUCTION_PROJECT_ID }}
+
+      - name: Migrate Supabase DB changes
         run: supabase db push --linked
