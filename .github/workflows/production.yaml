@@ -33,4 +33,4 @@ jobs:
           version: latest
 
       - name: Supabase DB Migrate
-        run: supabase db deploy --project-ref ${{ vars.PRODUCTION_PROJECT_ID }}
+        run: supabase db push --project-ref ${{ vars.PRODUCTION_PROJECT_ID }}
