@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - staging
+    paths:
+      - 'supabase/migrations/**'
 
   workflow_dispatch:
 
@@ -30,6 +32,6 @@ jobs:
         with:
           version: latest
 
-      - run: supabase link --project-ref ${{ vars.STAGING_PROJECT_ID }}
-      #- run: supabase db reset
-      - run: supabase db push
+      - name: Supabase DB Migrate
+        # run: supabase db reset
+        run: supabase db push --project-ref ${{ vars.STAGING_PROJECT_ID }}
