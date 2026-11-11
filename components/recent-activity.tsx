@@ -38,9 +38,9 @@ export function RecentActivity() {
           Measurements(bin_type),
           "Adding Material"(bin_id),
           "Moving Day"(moving_id),
-          "Mixing Bins"(mixing_id),
           "Finished Compost"(compost_id),
           "Browns Bin"(browns_id),
+          task_mix_bins(id),
           Issues(issue_id),
           Litter(litter_id)
         `)
@@ -91,17 +91,6 @@ export function RecentActivity() {
           });
         }
 
-        if (submission["Mixing Bins"] && submission["Mixing Bins"].length > 0) {
-          activityRecords.push({
-            id: `mixing-${submission.submission_id}`,
-            activity: "Mixing Bins",
-            date_time: dateTime,
-            site: siteName,
-            user: userName,
-            submission_id: submission.submission_id
-          });
-        }
-
         if (submission["Finished Compost"] && submission["Finished Compost"].length > 0) {
           activityRecords.push({
             id: `compost-${submission.submission_id}`,
@@ -117,6 +106,17 @@ export function RecentActivity() {
           activityRecords.push({
             id: `browns-${submission.submission_id}`,
             activity: "Adding Browns",
+            date_time: dateTime,
+            site: siteName,
+            user: userName,
+            submission_id: submission.submission_id
+          });
+        }
+
+        if (submission["task_mix_bins"] && submission["task_mix_bins"].length > 0) {
+          activityRecords.push({
+            id: `mixing-${submission.submission_id}`,
+            activity: "Mixing Bins",
             date_time: dateTime,
             site: siteName,
             user: userName,

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 interface MixingBinRecord {
-  mixing_id: number;
+  id: number;
   submission_id: number;
   mix_bin1?: boolean;
   mix_bin2?: boolean;
@@ -49,7 +49,7 @@ export function MixingBinsTable({ highlightedEntryId, onEntryHighlighted }: Mixi
   // Auto-open details modal for highlighted entry
   useEffect(() => {
     if (highlightedEntryId && mixingBins.length > 0) {
-      const target = mixingBins.find(m => m.mixing_id === highlightedEntryId);
+      const target = mixingBins.find(m => m.id === highlightedEntryId);
       if (target) {
         setSelectedMixingBin(target);
         // Clear the highlight after opening
@@ -67,9 +67,9 @@ export function MixingBinsTable({ highlightedEntryId, onEntryHighlighted }: Mixi
 
       // Fetch all mixing bin records
       const { data: mixingBinsData, error: mixingBinsError } = await supabase
-        .from('Mixing Bins')
+        .from('task_mix_bins')
         .select('*')
-        .order('mixing_id', { ascending: false });
+        .order('id', { ascending: false });
 
       if (mixingBinsError) throw mixingBinsError;
 
@@ -144,20 +144,20 @@ export function MixingBinsTable({ highlightedEntryId, onEntryHighlighted }: Mixi
       const supabase = createClient();
 
       const { error } = await supabase
-        .from('Mixing Bins')
+        .from('task_mix_bins')
         .update({
           mix_bin1: editData.mix_bin1,
           mix_bin2: editData.mix_bin2,
           mix_bin3: editData.mix_bin3,
           mix_bin4: editData.mix_bin4
         })
-        .eq('mixing_id', editData.mixing_id);
+        .eq('id', editData.id);
 
       if (error) throw error;
 
       // Update local state
       setMixingBins(prev => prev.map(mixingBin =>
-        mixingBin.mixing_id === editData.mixing_id
+        mixingBin.id === editData.id
           ? editData
           : mixingBin
       ));
@@ -189,15 +189,15 @@ export function MixingBinsTable({ highlightedEntryId, onEntryHighlighted }: Mixi
       const supabase = createClient();
 
       const { error } = await supabase
-        .from('Mixing Bins')
+        .from('task_mix_bins')
         .delete()
-        .eq('mixing_id', selectedMixingBin.mixing_id);
+        .eq('id', selectedMixingBin.id);
 
       if (error) throw error;
 
       // Update local state
       setMixingBins(prev => prev.filter(mixingBin =>
-        mixingBin.mixing_id !== selectedMixingBin.mixing_id
+        mixingBin.id !== selectedMixingBin.id
       ));
 
       // Close modal
@@ -231,7 +231,7 @@ export function MixingBinsTable({ highlightedEntryId, onEntryHighlighted }: Mixi
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-lg">Loading mixing bins data...</div>
+        <div className="text-lg">Loading mix bins data...</div>
       </div>
     );
   }
@@ -285,7 +285,7 @@ export function MixingBinsTable({ highlightedEntryId, onEntryHighlighted }: Mixi
               {mixingBins.map((mixingBin) => {
                 const submission = getSubmissionInfo(mixingBin.submission_id);
                 return (
-                  <tr key={mixingBin.mixing_id} className="hover:bg-indigo-50">
+                  <tr key={mixingBin.id} className="hover:bg-indigo-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {submission ? formatDate(submission.timestamp) : 'N/A'}
                     </td>
@@ -329,7 +329,7 @@ export function MixingBinsTable({ highlightedEntryId, onEntryHighlighted }: Mixi
                     Mixing Bin Details
                   </h3>
                   <p className="text-sm text-gray-600 mt-1">
-                    Mixing ID: {selectedMixingBin.mixing_id} | Submission ID: {selectedMixingBin.submission_id}
+                    Mixing ID: {selectedMixingBin.id} | Submission ID: {selectedMixingBin.submission_id}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -530,7 +530,7 @@ export function MixingBinsTable({ highlightedEntryId, onEntryHighlighted }: Mixi
                      Are you sure you want to delete this record? This action cannot be undone.
                    </p>
                    <div className="mt-3 text-xs text-gray-400">
-                     Mixing ID: {selectedMixingBin.mixing_id}
+                     Mixing ID: {selectedMixingBin.id}
                    </div>
                  </div>
                  <div className="flex justify-center space-x-4 px-4 py-3">

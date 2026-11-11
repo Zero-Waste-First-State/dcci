@@ -59,7 +59,7 @@ interface MovingDay {
 }
 
 interface MixingBins {
-  mixing_id: number;
+  id: number;
   submission_id: number;
   mix_bin1?: boolean;
   mix_bin2?: boolean;
@@ -177,12 +177,6 @@ export function FormSubmissionsTable() {
             .select('*')
             .eq('submission_id', submissionId);
 
-          // Fetch mixing bins
-          const { data: mixingBins, error: mixingBinsError } = await supabase
-            .from('Mixing Bins')
-            .select('*')
-            .eq('submission_id', submissionId);
-
           // Fetch finished compost
           const { data: finishedCompost, error: finishedCompostError } = await supabase
             .from('Finished Compost')
@@ -192,6 +186,12 @@ export function FormSubmissionsTable() {
           // Fetch browns bin
           const { data: brownsBin, error: brownsBinError } = await supabase
             .from('Browns Bin')
+            .select('*')
+            .eq('submission_id', submissionId);
+
+          // Fetch mixing bins
+          const { data: mixingBins, error: mixingBinsError } = await supabase
+            .from('task_mix_bins')
             .select('*')
             .eq('submission_id', submissionId);
 
@@ -1167,7 +1167,7 @@ export function FormSubmissionsTable() {
                        </button>
                      </div>
                      {selectedSubmission.mixing_bins.map((mixing) => (
-                       <div key={mixing.mixing_id} className="bg-blue-50 p-3 rounded border border-blue-200 text-black">
+                       <div key={mixing.id} className="bg-blue-50 p-3 rounded border border-blue-200 text-black">
                          <div className="flex justify-between items-start mb-2">
                            <div className="flex-1">
                              {mixing.mix_bin1 && <p>• Mixed Bin 1</p>}
@@ -1176,7 +1176,7 @@ export function FormSubmissionsTable() {
                              {mixing.mix_bin4 && <p>• Mixed Bin 4</p>}
                            </div>
                            <button
-                             onClick={() => navigateToSpecificEntry('mixing_bins', mixing.mixing_id)}
+                             onClick={() => navigateToSpecificEntry('mixing_bins', mixing.id)}
                              className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded hover:bg-blue-200 transition-colors ml-2"
                              title="View this specific mixing bins entry in table"
                            >
