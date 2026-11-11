@@ -1,8 +1,9 @@
-name: Run Supabase Schema Migrations on Staging (Preview)
+name: Supabase Migrations - Test/Preview
 
 on:
   push:
     branches:
+      - fix/*
       - staging
     paths:
       - 'supabase/migrations/**'
@@ -24,14 +25,18 @@ jobs:
       SUPABASE_PROJECT_ID: ${{ vars.STAGING_PROJECT_ID }}
 
     steps:
-      - name: Code Checkout
+      - name: Checkout Code
         uses: actions/checkout@v6
 
-      - name: Supabase CLI Setup
+      - name: Setup Supabase CLI
         uses: supabase/setup-cli@v2
         with:
           version: latest
 
-      - name: Supabase DB Migrate
-        # run: supabase db reset
-        run: supabase db push --project-ref ${{ vars.STAGING_PROJECT_ID }}
+      - name: Link Supabase Project
+        run: supabase link --project-ref ${{ vars.STAGING_PROJECT_ID }}
+
+        # supabase db reset ?
+
+      - name: Migrate Supabase DB changes
+        run: supabase db push --remote
